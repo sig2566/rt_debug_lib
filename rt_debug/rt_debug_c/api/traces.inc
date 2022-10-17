@@ -1,0 +1,5 @@
+//Define traces points: DEF_TRACE(group_name, trace_name, format string)
+DEF_TRACE(INIT_GROUP, CREATE_THREAD. New thread was created)
+DEF_TRACE(GEN_GROUP, PASSED. Passed)
+DEF_TRACE(GEN_GROUP, HW_WRITE. WRITE addr = 0x%X val = 0x%X)
+DEF_TRACE(GEN_GROUP, HW_READ. READ addr = 0x%X val = 0x%X)

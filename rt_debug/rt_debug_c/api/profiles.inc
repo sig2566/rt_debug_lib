@@ -1,0 +1,3 @@
+//Define profiler points
+DEF_PROFILE(GEN_GROUP, TST_PROF)
+DEF_PROFILE(GEN_GROUP, UI_PROF)
