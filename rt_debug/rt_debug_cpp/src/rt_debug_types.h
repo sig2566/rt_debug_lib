@@ -1,8 +1,22 @@
 
 #ifndef TOOLS_TRACER_RT_DEBUG_TYPES_H_
 #define TOOLS_TRACER_RT_DEBUG_TYPES_H_
-#include "rt_debug_api.h"
-#include "i_api_common.h"
+#include <cstdio>
+#include <cstdlib>
+#include <cassert>
+#include <limits.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <dlfcn.h>
+#include <string.h>
+#include <unistd.h>
+#include <iostream>
+#include <sstream>
+#include <errno.h>
+#include "i_sys_types.h"
+#include "i_cpp_sys_api.h"
+#include "i_cpp_module.h"
 //Data definition section
 // All strings should be align to 64 bytes
 
@@ -48,6 +62,7 @@ public:
 
 	CRT_counter_grp()
 	{
+		num_alloc_counters_= 0;
 	}
 
 	int32_t AllocCnt(char *cnt_name)
@@ -233,6 +248,14 @@ public:
 		strcpy(group_name_, group_name);
 	}
 
+	CProfileCnt* GetProfCounter(uint32_t prof_id)
+	{
+		if(prof_id>=num_alloc_prof_)
+		{
+			return NULL;
+		}
+		return &prof_cntrs_[prof_id];
+	}
 	uint32_t RegistryProfileEntry(char* prof_name)
 	{
 		uint32_t i;
@@ -244,8 +267,10 @@ public:
 				return i;
 			}
 		}
+
 		prof_fifo_[i].Setup(PROF_FIFO_SIZE, sizeof(ProfilerCntD), prof_name);
 		num_alloc_prof_++;
+		prof_cntrs_[i].Init(prof_name, static_cast<CMemArea*>(&prof_fifo_[i]));
 		return i;
 	}
 

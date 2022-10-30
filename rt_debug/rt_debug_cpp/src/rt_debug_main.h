@@ -10,7 +10,6 @@
 #ifndef TOOLS_TRACER_RT_DEBUG_MAIN_H_
 #define TOOLS_TRACER_RT_DEBUG_MAIN_H_
 #include "rt_debug_types.h"
-#include "i_cpp_module.h"
 
 using RT_DEBUG;
 struct TraceInfo
@@ -338,28 +337,36 @@ public:
 		return grp_profp->RegistryProfileEntry(prof_name);
 	}
 	//Collection profiler messages .
-	void		RTDBG_StartProfMeas(HANDLER debug_grp, uint32_t prof_id)
+	CProfileCnt* GetProfilerCnt(HANDLER debug_grp, uint32_t prof_id)
 	{
-		//ASSERT(rt_debugp_->IsDataCollected()!= true);
 		CGroupDebugRT* grp_p= rt_debugp_->GetDebugGrp(debug_grp);
 		CProfilerGroup* grp_profp = grp_p->GetProfiler();
+		CProfileCnt *prof_ptr= grp_profp->GetProfCounter(prof_id);
+		assert(prof_ptr!=NULL);
+		return prof_ptr;
+	}
+	void		RTDBG_StartProfMeas(HANDLER debug_grp, uint32_t prof_id)
+	{
+		CProfileCnt *prof_ptr= GetProfilerCnt(debug_grp, prof_id);
+		prof_ptr->
+
 
 	}
 	void		RTDBG_StopProfMeas(HANDLER debug_grp, uint32_t prof_id)
 	{
-
+		CProfileCnt *prof_ptr= GetProfilerCnt(debug_grp, prof_id);
 	}
 	void		RTDBG_SuspendProfMeas(HANDLER debug_grp, uint32_t prof_id)
 	{
-
+		CProfileCnt *prof_ptr= GetProfilerCnt(debug_grp, prof_id);
 	}
 	void		RTDBG_ResumeProfMeas(HANDLER debug_grp, uint32_t prof_id)
 	{
-
+		CProfileCnt *prof_ptr= GetProfilerCnt(debug_grp, prof_id);
 	}
 	void		RTDBG_PutProfVal(HANDLER debug_grp, uint32_t prof_id, uint32_t val)
 	{
-
+		CProfileCnt *prof_ptr= GetProfilerCnt(debug_grp, prof_id);
 	}
 	uint32_t	RTDBG_GetProfCntrs(HANDLER debug_grp)
 	{

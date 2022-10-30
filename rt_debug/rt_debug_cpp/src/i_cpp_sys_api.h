@@ -11,221 +11,25 @@
 //#include <asm/cachectl.h>
 //#include <asm/unistd.h>
 
-#include "rt_debug_api.h"
+
 
 //	Use this macro in order to ignore compiler alignment of data structures
 //	that are not aligned:
 #define PACK_STRUCT __attribute__((packed))
 
-
+#include "i_sys_utils.h"
 #include "i_osa_api.h"
+#include "rt_debug_api.h"
 //API definitions for 5G simulator modules
 #define MDO_NAME_SIZE    (80)
-namespace ns_5g_phy
+namespace RT_DEBUG
 {
 	enum EResultT
 	{
 		E_OK,
 		E_FAIL
 	};
-	struct SysTimeT : public GenSysTime
-	{
-	private:
-		uint32_t nsec_correction;
-	public:
 
-		//Add time offset in microseconds to the current system time.
-		void SysTimeUpdate(int32_t usec_diff, uint32_t nsec_remainder= 0)
-		{
-			nsec_correction+= nsec_remainder;
-
-			int32_t offset_tmp = usec_diff  + offset + (nsec_correction/1000);
-			nsec_correction= nsec_correction%1000;
-			int32_t borrow_nsf = offset_tmp <0 ? -1: 0;
-			int32_t nsf_tmp = (offset_tmp / SUBFRAME_USECS + nsf + borrow_nsf);
-			int32_t borrow_nf = nsf_tmp<0 ? -1: 0;
-
-			nf = ( (nsf_tmp/NUM_OF_SF_IN_FRAME  + nf + borrow_nf) % (SYS_FRAMES_NUM+1) + (SYS_FRAMES_NUM+1)) & SYS_FRAMES_NUM;
-
-
-			offset = (SUBFRAME_USECS + offset_tmp%SUBFRAME_USECS ) % SUBFRAME_USECS;
-			nsf = (nsf_tmp % NUM_OF_SF_IN_FRAME + NUM_OF_SF_IN_FRAME) % NUM_OF_SF_IN_FRAME;
-		}
-		void SetNsecCorrection(uint32_t nsec_correction_init)
-		{
-			 nsec_correction = nsec_correction_init;
-		}
-
-		uint32_t GetNsecCorrection()
-		{
-			return nsec_correction ;
-		}
-
-		uint32_t GetSlotNum()
-		{
-			return nsf*NUM_SLOTS_SF + offset/SLOT_DURATION;
-		}
-		uint32_t GetSlotOffset()
-		{
-			return offset%SLOT_DURATION;
-		}
-		void reset()
-		{
-			nf = nsf = offset = 0;
-			nsec_correction = 0;
-		}
-		SysTimeT()
-		{
-			reset();
-		}
-		SysTimeT(GenSysTime &sys_time)
-		{
-			 nf= sys_time.nf;
-			 nsf= sys_time.nsf;
-			 offset= sys_time.offset;
-			 nsec_correction = 0;
-		}
-	};
-	enum EAccessT
-	{
-		E_READ,
-		E_WRITE
-	};
-	enum ESeverityT
-	{
-		E_CRITICAL,
-		E_HIGH,
-		E_MEDIUM,
-		E_LOW,
-		E_BP,
-		E_INFO
-	};
-	enum ECallMethodT
-	{
-		E_PERIODIC,
-		E_ONCE
-	};
-
-	enum EDebugOperationT
-	{
-		E_VERSION,
-		E_PROFILER,
-		E_MAX_OP
-	};
-
-	/******************************************************************************************//*!
-	 *@class TimerEvent_api
-	 *@brief The purpose of this class is to callback after the timer event:
-	 *@brief
-	 *********************************************************************************************/
-	struct TimerEvent_api {
-		//Run the data engine function
-		/******************************************************************************************//*!
-		 *@function: TimerEvCallback
-		 *@brief The purpose of this function is callback after the timer event:
-		 *@brief Parameters:
-		 *@brief SysTimeT *sys_time_p  -- Current time
-		 *@brief int32_t param         -- Special parameter to indicate the event
-		 *@brief int32_t seq_val       -- Additional parameter, which indicates additional sequential parameter. It may be used to set information
-		 *@brief 						  about destination symbol number.
-		 *@brief SysTimeT *dst_time	   -- Destinations system time. It indicates the system time of the event, which is called in advance.
-		 *@brief
-		 *********************************************************************************************/
-
-		virtual void TimerEvCallback(SysTimeT *sys_time_p, int32_t param, int32_t seq_val, SysTimeT *dst_time =NULL)=	0;
-	};
-	enum E_EVENT_PERIOD
-	{
-		E_CUSTOM,
-		E_EVERY_SLOT
-	};
-	struct TimerEventSchedulerT
-	{
-		 E_EVENT_PERIOD event_periodicy;
-		 uint32_t		slot_offset; //Offset in slots. This offset is aligned with the slot start time. For example: 0 current slot, 1 start time of the next slot. Range: 2*(1<< Numerology)
-		 int32_t        usec_offset; //Offset in usecs from the slot start time
-		 uint32_t       *event_offsets; // Pointer to the table of offsets from the stall start time. The actual offset is calculated as sum of usec_offset with every event_offsets elements.
-		 	 	 	 	 	 	 	 	// If it is NULL then only usec_offset value is used.
-		 uint32_t		num_events;     // Number timer events in the event_offset array.
-		 uint32_t       send_val;		// Value to send with timer event call.
-		 uint32_t		*send_vals;
-		 bool           is_permanent;   // Set if the timer event is permanent or not
-		 TimerEvent_api* callback_timer_api;
-
-		/******************************************************************************************//*!
-		 *@function  SetPermanentTimerEvent
-		 *@brief The purpose of this function is to configure the permanent timer events
-		 *@brief Parameters:
-		 *@brief int32_t u_offset   			-- Time advance offset (usecs). If the event should be called in advance, then this parameter should be negative.
-		 *@brief const uint32_t  *ev_offsets    -- Pointer to list of events, which can be called per slot. If it is only one event per slot, then it may be set to NULL
-		 *@brief 								   and u_offset parameter can be used to set the event time.
-		 *@brief uint32_t	n_events			-- Number of events per slot.
-		 *@brief uint64_t   gen_val				-- Value, which used to identify the timer event
-		 *@brief TimerEvent_api* callback_api   -- Pointer to the class, which implements callback of timer event driver
-		 *@brief const uint32_t *vals			-- Pointer to additional sequential values, used per sequential event. For example they may contain information about the symbol number.
-		 *@brief
-		 *********************************************************************************************/
-		void SetPermanentTimerEvent(int32_t u_offset, const uint32_t  *ev_offsets, uint32_t	n_events,
-									uint64_t gen_val, TimerEvent_api* callback_api, const uint32_t *vals=NULL)
-		{
-			ASSERT(callback_api);
-			is_permanent= true;
-			event_periodicy = E_EVERY_SLOT;
-			slot_offset =0;
-			usec_offset = u_offset;
-			event_offsets = (uint32_t*)ev_offsets;
-			num_events= n_events;
-			send_val = gen_val;
-			callback_timer_api = callback_api;
-			send_vals = (uint32_t*)vals;
-		}
-
-		 //Temporary timer event is repeated every slot. It is possible to set single offset or vector of offsets.
-		/******************************************************************************************//*!
-		 *@function  SetPermanentTimerEvent
-		 *@brief The purpose of this function is to configure the temporary timer events
-		 *@brief Parameters:
-		 *@brief uint32_t slot_ofst             -- Offset in slots for the next timer event
-		 *@brief int32_t u_offset   			-- Time advance offset (usecs). If the event should be called in advance, then this parameter should be negative.
-		 *@brief const uint32_t  *ev_offsets    -- Pointer to list of events, which can be called per slot. If it is only one event per slot, then it may be set to NULL
-		 *@brief 								   and u_offset parameter can be used to set the event time.
-		 *@brief uint32_t	n_events			-- Number of events per slot.
-		 *@brief uint64_t   gen_val				-- Value, which used to identify the timer event
-		 *@brief TimerEvent_api* callback_api   -- Pointer to the class, which implements callback of timer event driver
-		 *@brief const uint32_t *vals			-- Pointer to additional sequential values, used per sequential event. For example they may contain information about the symbol number.
-		 *@brief
-		 *********************************************************************************************/
-		void SetTempTimerEvent(uint32_t slot_ofst, const int32_t u_offset, uint32_t  *ev_offsets, uint32_t	n_events,
-									uint64_t val, TimerEvent_api* callback_api, const uint32_t *vals=NULL)
-		{
-			ASSERT(callback_api);
-			is_permanent= false;
-			event_periodicy = E_CUSTOM;
-			slot_offset =slot_ofst;
-			usec_offset = u_offset;
-			event_offsets = ev_offsets;
-			num_events= n_events;
-			send_val = val;
-			callback_timer_api = callback_api;
-			send_vals = (uint32_t*)vals;
-		}
-
-		void Reset()
-		{
-			is_permanent = false;
-			usec_offset = slot_offset= send_val = 0;
-		    num_events = 0;
-		    event_offsets = NULL;
-		    callback_timer_api = NULL;
-		    event_periodicy = E_CUSTOM;
-		    send_vals = NULL;
-		}
-
-		TimerEventSchedulerT()
-		{
-		    Reset();
-		}
-	};
 	struct TraceDataT
 	{
 		uint32_t trace_id;
@@ -608,7 +412,7 @@ namespace ns_5g_phy
 	***********************************************************************************************///
 	template<class T, int32_t CHUNKS_NUM>class StaticMemArea : public CMemArea
 	{
-		__align(CACHE_ALIGNMENT) T buf_[CHUNKS_NUM];
+		alignas(CACHE_ALIGNMENT) T buf_[CHUNKS_NUM];
 	public:
 		  void *GetReadBufP()
 		  {
@@ -699,122 +503,260 @@ namespace ns_5g_phy
 	};
 
 
-	//Module APIs
-	/*******************************************************************************************//*!
-	*@class IModuleControlCallBackAPI
-	*@brief The purpose of this class is :
-	*@brief API for asynchronous services, provided by the framework to the 5G moduler
-	***********************************************************************************************/
-	class IModuleControlCallBackAPI
-	{
-	public:
+	typedef CMemArea* CMemAreaP;
 
-		virtual EResultT IMemAreaDefine(CMemAreaP *mearea_ptr_) = 0;
-		virtual EResultT IRegistryTraceEntry(char *format_str, uint32_t *id) = 0;
-		virtual EResultT IRegistryProfileEntry(CProfileCnt *ptr, char *name, uint32_t *prof_id) = 0;
-		virtual EResultT IRegisterTimerEvent(TimerEventSchedulerT *sched_info) = 0;
-		virtual EResultT ILogData(ESeverityT severity, char *str) = 0;
-		virtual EResultT ITraceData(uint32_t id, uint32_t line_num, uint64_t val0= 0, uint64_t val1=0, uint64_t val2=0, uint64_t val3=0) = 0;
-		virtual EResultT IStopRequest(ESeverityT severity) = 0;
-		virtual EResultT IGetSysTime(SysTimeT *sys_time_p) = 0;
-		virtual EResultT IGetModule(char mod_name[], IModuleControlAPI **mod_ptr) = 0;
-		virtual EResultT IMemAreaMount(CMemAreaP *mearea_ptr_, char area_name[], EAccessT ac_type) = 0;
-		virtual EResultT ISyncTime(SysTimeT *sys_time_p = NULL, timespec *linux_time =NULL ) = 0;
-		virtual EResultT IDelay_us(uint32_t usecs)= 0;
-		virtual EResultT IAllocateEventCnt(char *cnt_name, volatile int64_t **cnt_ptr)= 0;
-		virtual EResultT ISaveProfileInfo(uint32_t prof_id, ProfileData *data) = 0;
+   /******************************************************************************************//*!
+	*@class CProfileCnt
+	*@brief The purpose of this class is :
+	*@brief This class implements the profiler counter.
+	*********************************************************************************************/
+	enum EProfileEval_type
+	{
+		TIME_EVAL,
+		CYCLE_EVAL
 	};
 
-	/*******************************************************************************************//*!
-	*@class IModuleControlAPI
-	*@brief The purpose of this class is :
-	*@brief API for access to the 5G moduler
-	***********************************************************************************************/
-	class IModuleControlAPI
+	class alignas(CACHE_ALIGNMENT) CProfileCnt
 	{
-	public:
-		virtual EResultT IInit(IModuleControlCallBackAPI *callback_ptr, ITarget *target_api) = 0;
-		virtual EResultT IColdStart() = 0;
-		virtual EResultT IWarmStart() = 0;
-		virtual EResultT IHotStart() = 0;
-		virtual EResultT IStop(ESeverityT severity) = 0;
-		virtual EResultT ICall(SysTimeT *sys_time_p, uint32_t param) = 0;
-		virtual EResultT IConfigure(uint32_t id, void *in, void **out) = 0;
-		virtual EResultT IGetInfo(char* module_name, uint32_t *major_ver, uint32_t *minor_ver, uint32_t *build_num, char* add_info) = 0;
-	};
 
-	//Front End APIs
-	/*******************************************************************************************//*!
-	*@class IGL_ControlCallBackAPI
-	*@brief The purpose of this class is :
-	*@brief API RSE callback API
-	***********************************************************************************************/
-	class IGL_ControlCallBackAPI
+		ProfilerCntD prof_cnt_;
+		uint64_t acc_cnt_; //Support multiple start stop during one measurement
+		uint32_t cnt_id_;
+		uint32_t max_calls_;
+		uint64_t start_val_;
+		uint64_t delta_;
+		uint32_t	prof_id = -1;
+		CProfileCnt  *next_prof_p;
+		EProfileEval_type 	evalType_;
+		CMemArea *mem_ptr_ = NULL;
+
+
+	public:
+	CProfileCnt()
 	{
-	public:
-		virtual EResultT IStopRequest(ESeverityT severity) = 0;
-		virtual EResultT I_TTI_evt(SysTimeT *sys_time_p) = 0;
-	};
-
-	/*******************************************************************************************//*!
-	*@class IGL_DebugAPI
-	*@brief The purpose of this class is :
-	*@brief Debugger API to the running support component. That API allows the system debugging from
-	*@brief the externas application (front end).
-	***********************************************************************************************/
-	class IGL_DebugAPI	{
-	public:
-		virtual EResultT  	IDebugInit(char* add_info) = 0;
-		virtual EResultT  	IGetMemAreasNum(uint32_t *areas_num) = 0;
-		virtual CMemArea*  	IGetMemArea(uint32_t area_num) = 0;
-		virtual EResultT 	IGetModulesNum(uint32_t *modules_num) = 0;
-		virtual CModuleInfo IGetModule(uint32_t module_num) = 0;
-		virtual EResultT 	ISetLogSeverity(ESeverityT severity) = 0;
-		virtual EResultT 	IProfilerSave(char* file_name) = 0;
-		virtual EResultT 	ITraceSave(char* file_name) = 0;
-		virtual EResultT 	ICall(SysTimeT *sys_time_p, uint32_t param) = 0;
-		virtual EResultT 	ISetBP(SysTimeT *sys_time_p, char *data, uint32_t *id) = 0;
-		virtual EResultT 	IClearBP(uint32_t id) = 0;
-		virtual EResultT 	ISendCLI(char* command_str, char **respond) = 0;
-		virtual CMemArea** 	IGetProfilingData(uint32_t *nuentries_)= 0;
-		virtual CMemArea**	IGetLogData(uint32_t *nuentries_) = 0;
-
-	};
-
-
-	/*******************************************************************************************//*!
-	*@class IGL_ControlAPI
-	*@brief The purpose of this class is :
-	*@brief Running and control 5G enodev using external program (front end)
-	***********************************************************************************************/
-	class IGL_ControlAPI
+		cnt_id_ =0;
+		prof_cnt_.Reset();
+		max_calls_= 500;
+		acc_cnt_ = 0;
+		start_val_ = 0;
+		delta_ = 0;
+		next_prof_p = NULL;
+		evalType_ = TIME_EVAL;//TIME_EVAL;//CYCLE_EVAL;
+	}
+	CProfileCnt* GetNextProf()
 	{
-	public:
-		virtual EResultT IInit(	IGL_ControlCallBackAPI *control_callback_ptr, const char* config_file, char* add_info) = 0;
-		virtual EResultT IColdStart() = 0;
-		virtual EResultT IWarmStart() = 0;
-		virtual EResultT IHotStart() = 0;
-		virtual EResultT IStop(ESeverityT severity) = 0;
-		virtual EResultT IConfigure(uint32_t id, void *in, void **out) = 0;
-		virtual EResultT IGetInfo(char* module_name, uint32_t major_ver, uint32_t minor_ver, uint32_t build_num, char* add_info) = 0;
-		virtual EResultT IExitReq(ESeverityT severity) = 0;
-		//If fapi_req_p==NULL than there is not other requests in this TTI
-		virtual EResultT IFAPI_req_put(void* fapi_req_p) = 0;
-		//fapi_evt_p == NULL means no events.
-		virtual EResultT IFAPI_evt_get(void** fapi_evt_p) = 0;
-	};
-
-	//General factory API
-	/*******************************************************************************************//*!
-	*@class ITarget
-	*@brief The purpose of this class is :
-	*@brief Factory API using for connection to the classes implemented inside the library.
-	***********************************************************************************************/
-	class ITarget
+		return next_prof_p;
+	}
+	void ConnectProf(CProfileCnt *prof_addr)
 	{
-	public:
-		virtual EResultT IGetTarget(EInterfaceT api_type, uint32_t id, void **gl_api_ptr) = 0;
-		virtual EResultT IGetVersionInfo(char** module_name, uint32_t *major_ver, uint32_t *minor_ver, uint32_t *build_num, char** add_info) = 0;
+		next_prof_p = prof_addr;
+	}
+
+	void SetMaxCalls(uint32_t val)
+	{
+		max_calls_= val;
+	}
+	void Init(char *name, CMemArea *mem_ptr)
+	{
+		struct timespec t1, t0;
+		mem_ptr_ = mem_ptr;
+		prof_cnt_.Reset();
+		Reset();
+		if(evalType_ == TIME_EVAL)
+		{
+			int8_t number_delta_calls_iterations = 10;
+			delta_ = 0;
+			for(int8_t i=0; i<number_delta_calls_iterations; i++)
+			{
+				clock_gettime(CLOCK_MONOTONIC, &t0);
+				clock_gettime(CLOCK_MONOTONIC, &t1);
+				delta_ += (((uint64_t)t1.tv_sec * BILLION + (uint64_t)t1.tv_nsec) - ((uint64_t)t0.tv_sec * BILLION + (uint64_t)t0.tv_nsec));
+			}
+			delta_ /= number_delta_calls_iterations; //average amount of clocks for calling gettime
+
+		}
+		else
+		{
+			// call twice in order to ensure that the tsc code is located in cash and its running time is more correct
+			delta_ 		= tsc();
+			start_val_	= tsc();
+			delta_ 		= tsc();
+			start_val_	= tsc();
+			delta_ = start_val_ - delta_;
+			start_val_ = 0;
+
+		}
+
+	}
+	void Update()
+	{
+		ProfilerCntD tmp;
+		if(prof_cnt_.meas_num_ == 0)
+			return;
+		prof_cnt_.average_cnt_ = prof_cnt_.average_cnt_/prof_cnt_.meas_num_;
+
+		while(mem_ptr_->PushFIFO_MT(&prof_cnt_, sizeof(prof_cnt_))==E_FAIL )
+		{
+			mem_ptr_->PopFIFO_MT(&prof_cnt_, sizeof(prof_cnt_));
+		}
+
+		prof_cnt_.Reset();
+	}
+	void Start()
+	{
+		ASSERT(start_val_== 0);
+		//__sync_synchronize();
+		struct timespec t1, t0;
+		prof_cnt_.last_cnt_ =1; //Informs that the Start function was called
+
+		if(evalType_ == TIME_EVAL)
+		{
+			//clock_gettime(CLOCK_MONOTONIC, &t0);
+			clock_gettime(CLOCK_MONOTONIC, &t1);
+			//delta_ = (uint64_t)t0.tv_sec * BILLION + (uint64_t)t0.tv_nsec;
+			start_val_ = (uint64_t)t1.tv_sec * BILLION + (uint64_t)t1.tv_nsec;
+		}
+		else
+		{
+			// call twice in order to ensure that the tsc code is located in cash and its running time is more correct
+			start_val_	= tsc();
+		}
+		//__sync_synchronize();
+	}
+
+#if defined(__x86_64__) || defined(__amd64__)
+inline	uint64_t tsc(void)
+	{
+		register uint32_t lo, hi;
+		asm volatile ("rdtsc" : "=a" (lo), "=d" (hi));
+		return ((uint64_t)hi << 32UL) | (uint32_t)lo;
+	}
+#elif defined(__aarch64__)
+inline	uint64_t tsc(void)
+	{
+
+ /*
+// this code should work on our ARM processor since it's ver8 architecture, but it does not recognize "mrc" assembly command for some reason
+#if (__ARM_ARCH >= 6)
+		uint32_t pmccntr;
+		uint32_t pmuseren;
+		uint32_t pmcntenset;
+		  // Read the user mode perf monitor counter access permissions.
+		  asm volatile("mrc p15, 0, %0, c9, c14, 0" : "=r"(pmuseren));
+		  if (pmuseren & 1) {  // Allows reading perfmon counters for user mode code.
+			asm volatile("mrc p15, 0, %0, c9, c12, 1" : "=r"(pmcntenset));
+			if (pmcntenset & 0x80000000ul) {  // Is it counting?
+			  asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r"(pmccntr));
+			  // The counter is set up to count every 64th cycle
+			  return static_cast<uint64_t>(pmccntr) * 64;  // Should optimize to << 6
+			}
+		  }
+#endif
+ */
+
+		  // System timer of ARMv8 runs at a different frequency than the CPU's.
+		  // The frequency is fixed, typically in the range 1-50MHz.  It can be
+		  // read at CNTFRQ special register.  We assume the OS has set up
+		  // the virtual timer properly.
+
+		int64_t virtual_timer_value;
+		asm volatile("mrs %0, cntvct_el0" : "=r"(virtual_timer_value));
+		return (uint32_t)virtual_timer_value;
+	}
+#endif
+
+
+	void StopContinue()
+	{
+		struct timespec t1;
+		uint64_t t64;
+		if(evalType_ == TIME_EVAL)
+		{
+			clock_gettime(CLOCK_MONOTONIC, &t1);
+			t64= (uint64_t)t1.tv_sec * BILLION + (uint64_t)t1.tv_nsec;
+		}
+		else
+		{
+			t64 = tsc();
+		}
+		acc_cnt_ += t64 - start_val_;
+		start_val_ = 0;
+
+	}
+	void ForceStop()
+	{
+		Update();
+		Reset();
+	}
+	void Stop(uint64_t *prof_valp = NULL)
+	{
+		//__sync_synchronize();
+		struct timespec t1;
+		volatile uint64_t t64;
+		if(prof_valp==NULL)
+		{
+			//Calculate time profiling between calling start and stop functions
+			if(evalType_ == TIME_EVAL)
+			{
+				clock_gettime(CLOCK_MONOTONIC, &t1);
+				t64= (uint64_t)t1.tv_sec * BILLION + (uint64_t)t1.tv_nsec;
+			}
+			else
+			{
+				t64 = tsc();
+			}
+
+			int64_t tmp_val = t64 - start_val_ + acc_cnt_ - delta_;// check if calling to both, the tested code and gettime function, took less time than delta_ time (it can happen in case of caching issues)
+			if(tmp_val < 0)
+			{
+				prof_cnt_.last_cnt_ = 20; //add artificial small number of nsecs (20nsec is about 30 cycles for 1.6 Ghz CPU clock)
+			}
+			else
+			{
+				prof_cnt_.last_cnt_= tmp_val;
+			}
+		}
+		else
+		{
+			//Calculate profiling of any values
+			prof_cnt_.last_cnt_= *prof_valp;
+		}
+		//prof_cnt_.last_cnt_=  t64 - start_val_ + acc_cnt_ - delta_;
+		//prof_cnt_.last_cnt_=  t64 - start_val_ + acc_cnt_; // force delta_ = 0 since there is sometime values of the counter less than delta and then we get negative measurement
+		//ASSERT(delta_ < 10000L)
+		//ASSERT((t64 - start_val_) < 100000000000L)
+		//ASSERT(acc_cnt_ == 0)
+		//ASSERT(prof_cnt_.last_cnt_ < 100000000000L)
+#ifdef yafit
+		if(prof_cnt_.last_cnt_ > 100000000000L)
+		{
+			printf("t64=%llu, start_val_=%llu, acc_cnt_=%llu, delta_=%llu\n", t64, start_val_, acc_cnt_, delta_);
+		}
+#endif
+		acc_cnt_ = 0;
+		if(prof_cnt_.last_cnt_ > prof_cnt_.max_cnt_)
+		{
+			prof_cnt_.max_cnt_ = prof_cnt_.last_cnt_;
+			prof_cnt_.max_cnt_time_ = start_val_;
+		}
+		prof_cnt_.average_cnt_ += prof_cnt_.last_cnt_;
+		start_val_ = 0;
+		prof_cnt_.meas_num_++;
+		if((max_calls_ !=0) &&(  max_calls_ <= prof_cnt_.meas_num_))
+		{
+			Update();
+		}
+		//__sync_synchronize();
+	}
+
+
+	void Reset()
+	{
+		prof_cnt_.Reset();
+		start_val_ = 0;
+		acc_cnt_ = 0;
+	}
+
 	};
 }; //Namespace definition
 //API function to connect with ITarget API
