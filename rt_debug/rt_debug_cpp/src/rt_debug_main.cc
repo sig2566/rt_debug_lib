@@ -13,7 +13,7 @@
 #include <fcntl.h>
 #include "rt_debug_main.h"
 
-
+using namespace RT_DEBUG;
 bool  	CDebugHandler::RTDBG_ActivateDebugDataCollection()
 {
 	ASSERT(mem_attached_ == false);
@@ -210,9 +210,9 @@ EXTERN_C void RTDBG_AddLog(HANDLER debug_grp, GenSysTime *sys_time, char *log_st
 {
 	return debug_handler.RTDBG_AddLog(debug_grp, sys_time, log_str);
 }
-EXTERN_C  bool RTDBG_GetLog(char *log_str, timespec *linux_time)
+EXTERN_C  bool RTDBG_GetLog(char *log_str, timespec *linux_time, uint64_t grp_mask)
 {
-	return debug_handler.RTDBG_GetLog(log_str, linux_time);
+	return debug_handler.RTDBG_GetLog(log_str, linux_time, grp_mask);
 }
 
 //Profiler support
@@ -220,19 +220,25 @@ EXTERN_C uint32_t  	RTDBG_AddProfiler(HANDLER debug_grp, char *prof_name)
 {
 	return debug_handler.RTDBG_AddProfiler(debug_grp, prof_name);
 }
-EXTERN_C void		RTDBG_SaveProfMeas(HANDLER debug_grp, uint32_t prof_id, ProfileData *data)
+EXTERN_C void		RTDBG_StartProfMeas(HANDLER debug_grp, uint32_t prof_id)
 {
-	debug_handler.RTDBG_SaveProfMeas(debug_grp, prof_id, data);
+	debug_handler.RTDBG_StartProfMeas(debug_grp, prof_id);
+
 }
-EXTERN_C uint32_t	RTDBG_GetProfCntrs(HANDLER debug_grp)
+EXTERN_C uint32_t	RTDBG_StopProfMeas(HANDLER debug_grp, uint32_t prof_id)
 {
-	return debug_handler.RTDBG_GetProfCntrs(debug_grp);
+	return debug_handler.RTDBG_StopProfMeas(debug_grp, prof_id);
 }
+
 EXTERN_C bool		RTDBG_GetProfInfo(HANDLER debug_grp, uint32_t prof_id, ProfileData *prof_data, char *grp_name, char* prof_name)
 {
 	return debug_handler.RTDBG_GetProfInfo(debug_grp, prof_id, prof_data, grp_name, prof_name);
 }
 
+EXTERN_C void		RTDBG_StopStartProfMeas(HANDLER debug_grp, uint32_t prof_id)
+{
+	return debug_handler.RTDBG_StopStartProfMeas(debug_grp, prof_id);
+}
 //General RT Debug API
 EXTERN_C void        RTDBG_Init()
 {
@@ -243,6 +249,10 @@ EXTERN_C HANDLER     RTDBG_AllocRTDebugGroup(char* group_name)
 	return debug_handler.RTDBG_AllocRTDebugGroup(group_name);
 }
 
+EXTERN_C void RTDBG_PutProfVal(HANDLER debug_grp, uint32_t prof_id, uint64_t *val)
+{
+	return debug_handler.RTDBG_PutProfVal(debug_grp, prof_id, val);
+}
 //Return the name of the group debug_grp
 EXTERN_C bool	RTDBG_GetGrpName(HANDLER debug_grp, char  *grp_name)
 {

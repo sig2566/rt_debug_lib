@@ -11,7 +11,7 @@
 #define TOOLS_TRACER_RT_DEBUG_MAIN_H_
 #include "rt_debug_types.h"
 
-using RT_DEBUG;
+using namespace RT_DEBUG;
 struct TraceInfo
 {
 	char trace_str[TRACE_STRING_SIZE*2];
@@ -31,6 +31,7 @@ struct LogSort_Data
  *@brief Implement RT debugging features call. I serves as a bridge between the process RAM and RT
  *@brief debugging class CDebugRT, which is implemented "inside" shared memory
  *********************************************************************************************/
+
 class CDebugHandler
 {
 	RTDBG_STATUS_T status_;
@@ -236,7 +237,7 @@ public:
 		fprintf(fptr,"********\n");
 		fprintf(fptr,"\n\nLogs\n");
 		fprintf(fptr,"********\n");
-		while(RTDBG_GetLog(buf, &lin_time)== true)
+		while(RTDBG_GetLog(buf, &lin_time, -1)== true)
 		{
 			fprintf(fptr,"%s\n",buf);
 		}
@@ -277,7 +278,7 @@ public:
 		CLog_group* log_grp= grp_p->GetLogger();
 		log_grp->AddLog(sys_time, log_str);
 	}
-	bool RTDBG_GetLog(char *log_str, timespec *linux_time)
+	bool RTDBG_GetLog(char *log_str, timespec *linux_time, uint64_t mask_logs = -1)
 	{
 		bool res = false;
 		uint32_t i;
@@ -289,7 +290,7 @@ public:
 		uint32_t num_grp= rt_debugp_->GetNumGrps();
 		for(i=0; i<num_grp; i++)
 		{
-			if(grp_logs_last[i].valid == false)
+			if((mask_logs & 1<<i) && (grp_logs_last[i].valid == false))
 			{
 				//No Log on the table. Extract new log
 				CGroupDebugRT* grp_p= rt_debugp_->GetDebugGrp(i);
@@ -348,27 +349,28 @@ public:
 	void		RTDBG_StartProfMeas(HANDLER debug_grp, uint32_t prof_id)
 	{
 		CProfileCnt *prof_ptr= GetProfilerCnt(debug_grp, prof_id);
-		prof_ptr->
-
+		prof_ptr->Start();
 
 	}
 	void		RTDBG_StopProfMeas(HANDLER debug_grp, uint32_t prof_id)
 	{
 		CProfileCnt *prof_ptr= GetProfilerCnt(debug_grp, prof_id);
+		prof_ptr->Stop();
 	}
-	void		RTDBG_SuspendProfMeas(HANDLER debug_grp, uint32_t prof_id)
+
+	void		RTDBG_PutProfVal(HANDLER debug_grp, uint32_t prof_id, uint64_t *val)
 	{
 		CProfileCnt *prof_ptr= GetProfilerCnt(debug_grp, prof_id);
+		prof_ptr->Stop(val);
 	}
-	void		RTDBG_ResumeProfMeas(HANDLER debug_grp, uint32_t prof_id)
+
+	void		RTDBG_StopStartProfMeas(HANDLER debug_grp, uint32_t prof_id)
 	{
 		CProfileCnt *prof_ptr= GetProfilerCnt(debug_grp, prof_id);
+		prof_ptr->StopContinue();
 	}
-	void		RTDBG_PutProfVal(HANDLER debug_grp, uint32_t prof_id, uint32_t val)
-	{
-		CProfileCnt *prof_ptr= GetProfilerCnt(debug_grp, prof_id);
-	}
-	uint32_t	RTDBG_GetProfCntrs(HANDLER debug_grp)
+
+	uint32_t	RTDBG_AllocProfCntr(HANDLER debug_grp)
 	{
 		if(!mem_attached_)
 			return -1;

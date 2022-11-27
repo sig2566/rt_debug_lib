@@ -11,7 +11,7 @@
 
 
 //Tracer methods
-
+using namespace RT_DEBUG;
 void CTraceGroup::Reset(bool attach)
 {
 	uint32_t i;

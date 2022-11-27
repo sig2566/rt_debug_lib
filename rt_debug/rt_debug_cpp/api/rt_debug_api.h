@@ -24,7 +24,7 @@
 #include <errno.h>
 
 #include "i_sys_types.h"
-#include "common_typedef.h"
+//#include "common_typedef.h"
 #include "i_sys_utils.h"
 
 #ifdef __cplusplus
@@ -42,7 +42,7 @@ typedef enum
 typedef uint32_t HANDLER;
 struct RT_counter
 {
-	volatile __align(CACHE_ALIGNMENT) int64_t val;
+	alignas(CACHE_ALIGNMENT) volatile int64_t val;
 	char							  cnt_name[TRACE_STRING_SIZE];
 };
 
@@ -71,7 +71,7 @@ uint32_t    RTDBG_AddTraceEntry(HANDLER grp, char* format);
 void RTDBG_AddLog(HANDLER debug_grp, GenSysTime *sys_time, char *log_str);
 
 //Extract the earliest log
-bool RTDBG_GetLog(char *log_strm, timespec *linux_time);
+bool RTDBG_GetLog(char *log_strm, timespec *linux_time, uint64_t grp_mask);
 
 //Profiler support
 //Allocate new profiling entry with name prof_name
@@ -80,12 +80,11 @@ uint32_t  	RTDBG_AddProfiler(HANDLER debug_grp, char *prof_name);
 //Collection profiler messages .
 void		RTDBG_StartProfMeas(HANDLER debug_grp, uint32_t prof_id);
 void		RTDBG_StopProfMeas(HANDLER debug_grp, uint32_t prof_id);
-void		RTDBG_SuspendProfMeas(HANDLER debug_grp, uint32_t prof_id);
-void		RTDBG_ResumeProfMeas(HANDLER debug_grp, uint32_t prof_id);
-void		RTDBG_PutProfVal(HANDLER debug_grp, uint32_t prof_id, uint32_t val);
+void		RTDBG_StopStartProfMeas(HANDLER debug_grp, uint32_t prof_id);
+void		RTDBG_PutProfVal(HANDLER debug_grp, uint32_t prof_id, uint64_t *val);
 
 //Extract number allocated profilers per group.
-uint32_t	RTDBG_GetProfCntrs(HANDLER debug_grp);
+uint32_t	RTDBG_AllocProfCntr(HANDLER debug_grp);
 //Extract commulative profiler data, using all saved measurements
 bool		RTDBG_GetProfInfo(HANDLER debug_grp, uint32_t prof_id, ProfileData *prof_data, char *grp_name, char* prof_name);
 
