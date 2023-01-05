@@ -16,10 +16,12 @@
 //	Use this macro in order to ignore compiler alignment of data structures
 //	that are not aligned:
 #define PACK_STRUCT __attribute__((packed))
-
+#include "common_typedef.h"
 #include "i_sys_types.h"
 #include "i_osa_api.h"
-#include "rt_debug_api.h"
+//#include "rt_debug_cpp.h"
+
+//#include "rt_debug_api.h"
 //API definitions for 5G simulator modules
 #define MDO_NAME_SIZE    (80)
 namespace RT_DEBUG
@@ -30,6 +32,64 @@ namespace RT_DEBUG
 		E_FAIL
 	};
 
+	struct SysTimeT : public GenSysTime
+	{
+	private:
+		uint32_t nsec_correction;
+	public:
+
+		//Add time offset in microseconds to the current system time.
+		void SysTimeUpdate(int32_t usec_diff, uint32_t nsec_remainder= 0)
+		{
+			nsec_correction+= nsec_remainder;
+
+			int32_t offset_tmp = usec_diff  + offset + (nsec_correction/1000);
+			nsec_correction= nsec_correction%1000;
+			int32_t borrow_nsf = offset_tmp <0 ? -1: 0;
+			int32_t nsf_tmp = (offset_tmp / SUBFRAME_USECS + nsf + borrow_nsf);
+			int32_t borrow_nf = nsf_tmp<0 ? -1: 0;
+
+			nf = ( (nsf_tmp/NUM_OF_SF_IN_FRAME  + nf + borrow_nf) % (SYS_FRAMES_NUM+1) + (SYS_FRAMES_NUM+1)) & SYS_FRAMES_NUM;
+
+
+			offset = (SUBFRAME_USECS + offset_tmp%SUBFRAME_USECS ) % SUBFRAME_USECS;
+			nsf = (nsf_tmp % NUM_OF_SF_IN_FRAME + NUM_OF_SF_IN_FRAME) % NUM_OF_SF_IN_FRAME;
+		}
+		void SetNsecCorrection(uint32_t nsec_correction_init)
+		{
+			 nsec_correction = nsec_correction_init;
+		}
+
+		uint32_t GetNsecCorrection()
+		{
+			return nsec_correction ;
+		}
+
+		uint32_t GetSlotNum()
+		{
+			return nsf*NUM_SLOTS_SF + offset/SLOT_DURATION;
+		}
+		uint32_t GetSlotOffset()
+		{
+			return offset%SLOT_DURATION;
+		}
+		void reset()
+		{
+			nf = nsf = offset = 0;
+			nsec_correction = 0;
+		}
+		SysTimeT()
+		{
+			reset();
+		}
+		SysTimeT(GenSysTime &sys_time)
+		{
+			 nf= sys_time.nf;
+			 nsf= sys_time.nsf;
+			 offset= sys_time.offset;
+			 nsec_correction = 0;
+		}
+	};
 	struct TraceDataT
 	{
 		uint32_t trace_id;
@@ -145,9 +205,9 @@ namespace RT_DEBUG
 	  void *ptr_consumer_;
 	  uint32_t number_chunks_;
 	  uint32_t single_chunk_size_;
-	  alignas(CACHE_ALIGNMENT) volatile  uint32_t wr_ind_; // make write pointer be aligned to the cache-line size of the processor
-	  alignas(CACHE_ALIGNMENT) volatile  uint32_t rd_ind_; // make read pointer be aligned to the cache-line size of the processor
-	  alignas(CACHE_ALIGNMENT) EAccessT access_;
+	  volatile __align(CACHE_ALIGNMENT) uint32_t wr_ind_; // make write pointer be aligned to the cache-line size of the processor
+	  volatile __align(CACHE_ALIGNMENT) uint32_t rd_ind_; // make read pointer be aligned to the cache-line size of the processor
+	  __align(CACHE_ALIGNMENT)  EAccessT access_;
 	  uint32_t attrib_;
 	  OSA_spinlock_t in_lock_;
 	  OSA_spinlock_t out_lock_;
@@ -406,7 +466,7 @@ namespace RT_DEBUG
 	***********************************************************************************************///
 	template<class T, int32_t CHUNKS_NUM>class StaticMemArea : public CMemArea
 	{
-		alignas(CACHE_ALIGNMENT) T buf_[CHUNKS_NUM];
+		__align(CACHE_ALIGNMENT) T buf_[CHUNKS_NUM];
 	public:
 		  void *GetReadBufP()
 		  {

@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include "rt_debug_api.h"
 #include "rt_debug_main.h"
 
 using namespace RT_DEBUG;
@@ -225,7 +226,7 @@ EXTERN_C void		RTDBG_StartProfMeas(HANDLER debug_grp, uint32_t prof_id)
 	debug_handler.RTDBG_StartProfMeas(debug_grp, prof_id);
 
 }
-EXTERN_C uint32_t	RTDBG_StopProfMeas(HANDLER debug_grp, uint32_t prof_id)
+EXTERN_C void	RTDBG_StopProfMeas(HANDLER debug_grp, uint32_t prof_id)
 {
 	return debug_handler.RTDBG_StopProfMeas(debug_grp, prof_id);
 }

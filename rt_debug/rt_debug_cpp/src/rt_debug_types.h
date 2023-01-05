@@ -15,6 +15,7 @@
 #include <sstream>
 #include <errno.h>
 #include "i_sys_types.h"
+#include "rt_debug_api.h"
 #include "i_cpp_sys_api.h"
 #include "i_cpp_module.h"
 //Data definition section
@@ -32,7 +33,7 @@ class CDebugRT;
 ***********************************************************************************************///
 class CRT_counter_grp
 {
-	alignas(CACHE_ALIGNMENT) RT_counter rt_counters_[NUM_COUNTERS];
+	alignas(CACHE_ALIGNMENT)  RT_counter rt_counters_[NUM_COUNTERS];
 	uint32_t num_alloc_counters_;
 	char group_name_[TRACE_STRING_SIZE];
 
@@ -204,7 +205,7 @@ public:
 
 		SysTimeT curr_sys_time(tmp_entry.sys_time);
 		t64= (uint64_t)tmp_entry.linux_time.tv_sec * BILLION + (uint64_t)tmp_entry.linux_time.tv_nsec;
-		n=  sprintf(log_entry, "%lld, %d, %d, %d, %s,  %s", t64, curr_sys_time.nf, curr_sys_time.nsf, curr_sys_time.offset,
+		n=  sprintf(log_entry, "%ulld, %ud, %ud, %d, %s,  %s", t64, curr_sys_time.nf, curr_sys_time.nsf, curr_sys_time.offset,
 				group_name_, tmp_entry.log_str);
 		*linux_time= tmp_entry.linux_time;
 		*sys_time = tmp_entry.sys_time;
@@ -235,7 +236,7 @@ enum EProfileEval_type
 	CYCLE_EVAL
 };
 
-class alignas(CACHE_ALIGNMENT) CProfileCnt
+alignas(CACHE_ALIGNMENT)   class  CProfileCnt
 {
 
 	ProfilerCntD prof_cnt_;
@@ -590,10 +591,10 @@ public:
 ***********************************************************************************************///
 class CGroupDebugRT
 {
-	alignas(CACHE_ALIGNMENT)CLog_group 		logger_;
-	alignas(CACHE_ALIGNMENT)CProfilerGroup 	profiler_;
-	alignas(CACHE_ALIGNMENT)CTraceGroup  	tracer_;
-	alignas(CACHE_ALIGNMENT)CRT_counter_grp	evemt_counters_;
+	alignas(CACHE_ALIGNMENT)  CLog_group 		logger_;
+	alignas(CACHE_ALIGNMENT)  CProfilerGroup 	profiler_;
+	alignas(CACHE_ALIGNMENT)  CTraceGroup  	tracer_;
+	alignas(CACHE_ALIGNMENT)  CRT_counter_grp	evemt_counters_;
 	char group_name_[TRACE_STRING_SIZE];
 
 public:
@@ -653,11 +654,11 @@ class CDebugRT
 public:
 	uint32_t test_val;
 	uint32_t num_alloc_groups_;
-	alignas(CACHE_ALIGNMENT) volatile bool active_;
-	alignas(CACHE_ALIGNMENT) volatile bool trace_collected_;
+	alignas(CACHE_ALIGNMENT)   volatile bool active_;
+	alignas(CACHE_ALIGNMENT)   volatile bool trace_collected_;
 
-	alignas(CACHE_ALIGNMENT)CGroupDebugRT debug_groups_[MAX_GROUP_NUM];
-	alignas(CACHE_ALIGNMENT)char filler[64];
+	alignas(CACHE_ALIGNMENT)  CGroupDebugRT debug_groups_[MAX_GROUP_NUM];
+	alignas(CACHE_ALIGNMENT)  char filler[64];
 
 
 public:

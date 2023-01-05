@@ -125,7 +125,7 @@ bool CTraceGroup::GetTraceEntry(char *trace_entry_str, timespec *linux_time, Gen
 	t64= (uint64_t)trace_entry_ptr->linux_time.tv_sec * BILLION + (uint64_t)trace_entry_ptr->linux_time.tv_nsec;
 	SysTimeT curr_sys_time(trace_entry_ptr->sys_time);
 	trace_entry_str[0] = 0;
-	n=  sprintf(trace_entry_str, "%lld, %d, %d, %d, %s, %d, %d, ", t64, curr_sys_time.nf, curr_sys_time.nsf, curr_sys_time.offset,
+	n=  sprintf(trace_entry_str, "%ulld, %d, %d, %d, %s, %d, %d, ", t64, curr_sys_time.nf, curr_sys_time.nsf, curr_sys_time.offset,
 			group_name_,  trace_entry_ptr->thread_id, trace_entry_ptr->line_num);
 	n1= sprintf(trace_entry_str +n, format, trace_entry_ptr->vals[0], trace_entry_ptr->vals[1], trace_entry_ptr->vals[2] , trace_entry_ptr->vals[3] );
 	*linux_time= trace_entry_ptr->linux_time;

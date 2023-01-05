@@ -17,7 +17,7 @@
  * -----------------------------------------------------------
  */
 
-
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,7 +39,7 @@ extern "C" {
 
 typedef const char cchar;
 
-
+#if 0
 #ifndef uint8_t
 typedef unsigned char uint8_t;
 #endif
@@ -48,46 +48,26 @@ typedef unsigned char uint8_t;
 typedef unsigned char* uint8_ptr;
 #endif
 
-#ifndef vuint8_t
-typedef volatile unsigned char vuint8_t;
-#endif
-
 #ifndef uint16_t
 typedef unsigned short uint16_t;
-#endif
-
-#ifndef vuint16_t
-typedef volatile unsigned short vuint16_t;
 #endif
 
 #ifndef uint32_t
 typedef unsigned int uint32_t;
 #endif
 
-#ifndef vuint32_t
-typedef volatile unsigned int vuint32_t;
-#endif
 
-#ifndef float32_t
-typedef float float32_t;
-#endif
 
-#ifndef vfloat32_t
-typedef volatile float vfloat32_t;
-#endif
 
 #ifndef uint64_t
 typedef unsigned long long uint64_t;
 #endif
 
-#ifndef vuint64_t
-typedef volatile unsigned long long vuint64_t;
-#endif
 
 #ifndef int8_t
 typedef signed char int8_t;
 #endif
-
+#
 #ifndef int16_t
 typedef signed short int16_t;
 #endif
@@ -96,8 +76,42 @@ typedef signed short int16_t;
 typedef signed int int32_t;
 #endif
 
-#ifndef int64_t
-typedef signed long long int64_t;
+
+#endif
+
+
+
+#ifndef float32_t
+typedef float float32_t;
+#endif
+
+
+#ifndef vuint8_t
+typedef volatile unsigned char vuint8_t;
+#endif
+
+
+#ifndef vfloat32_t
+typedef volatile float vfloat32_t;
+#endif
+
+
+#ifndef vuint32_t
+typedef volatile unsigned int vuint32_t;
+#endif
+#ifndef vuint16_t
+typedef volatile unsigned short vuint16_t;
+#endif
+
+
+
+
+//#ifndef int64_t
+//typedef signed long long int64_t;
+//#endif
+
+#ifndef vuint64_t
+typedef volatile unsigned long long vuint64_t;
 #endif
 
 #ifndef vchar_t

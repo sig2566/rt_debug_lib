@@ -199,7 +199,7 @@ public:
 			for(j=0; j< num_ev_cnt; j++)
 			{
 				RT_counter* cnt_p =grp_cntrs_p->Get_counter(j);
-				fprintf(fptr,"%s, %s, %lld\n", grp_name, cnt_p->cnt_name, cnt_p->val);
+				fprintf(fptr,"%s, %s, %ulld\n", grp_name, cnt_p->cnt_name, cnt_p->val);
 			}
 		}
 
@@ -220,7 +220,7 @@ public:
 				char prof_name[1000];
 				if(grp_profp->GetProfInfo(j, &prof_tmp, prof_name))
 				{
-					fprintf(fptr, "%s, %s, avg=, %lld, max=, %lld, last=, %lld, max time=, %lld, measurements=, %lld\n",
+					fprintf(fptr, "%s, %s, avg=, %ulld, max=, %ulld, last=, %ulld, max time=, %ulld, measurements=, %ulld\n",
 							grp_name, prof_name, prof_tmp.average_cnt_, prof_tmp.max_cnt_, prof_tmp.last_cnt_, prof_tmp.max_cnt_time_, prof_tmp.meas_num_);
 				}
 			}

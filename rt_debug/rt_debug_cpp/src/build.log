@@ -1,0 +1,114 @@
+./rt_debug_main.cc ./rt_debug_types.cc -I../api/ -I../..//api
+rt_debug_main.o rt_debug_types.o
+CPP aarch64-xilinx-linux-gcc -E  -mcpu=cortex-a72.cortex-a53 -march=armv8-a+crc -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/home/devops/xilinx/petalinux-v2022.1-uep60-sdk/sysroots/cortexa72-cortexa53-xilinx-linux
+CC1 aarch64-xilinx-linux-gcc  -mcpu=cortex-a72.cortex-a53 -march=armv8-a+crc -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/home/devops/xilinx/petalinux-v2022.1-uep60-sdk/sysroots/cortexa72-cortexa53-xilinx-linux
+CC2 aarch64-xilinx-linux-gcc  -mcpu=cortex-a72.cortex-a53 -march=armv8-a+crc -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/home/devops/xilinx/petalinux-v2022.1-uep60-sdk/sysroots/cortexa72-cortexa53-xilinx-linux
+CC3 aarch64-xilinx-linux-gcc  -mcpu=cortex-a72.cortex-a53 -march=armv8-a+crc -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/home/devops/xilinx/petalinux-v2022.1-uep60-sdk/sysroots/cortexa72-cortexa53-xilinx-linux
+aarch64-xilinx-linux-gcc  -mcpu=cortex-a72.cortex-a53 -march=armv8-a+crc -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/home/devops/xilinx/petalinux-v2022.1-uep60-sdk/sysroots/cortexa72-cortexa53-xilinx-linux    -I../api/  -I../..//api    -g -O0 -DDEBUG   -fPIC -c ./rt_debug_main.cc ./rt_debug_types.cc
+cc1plus: warning: include location "/usr/local/include" is unsafe for cross-compilation [-Wpoison-system-directories]
+In file included from /home/devops/xilinx/petalinux-v2022.1-uep60-sdk/sysroots/cortexa72-cortexa53-xilinx-linux/usr/include/sys/mman.h:22,
+                 from ./rt_debug_main.cc:10:
+/home/devops/xilinx/petalinux-v2022.1-uep60-sdk/sysroots/cortexa72-cortexa53-xilinx-linux/usr/include/features.h:412:4: warning: #warning _FORTIFY_SOURCE requires compiling with optimization (-O) [-Wcpp]
+  412 | #  warning _FORTIFY_SOURCE requires compiling with optimization (-O)
+      |    ^~~~~~~
+In file included from ./rt_debug_main.h:12,
+                 from ./rt_debug_main.cc:15:
+./rt_debug_types.h: In member function ‘bool RT_DEBUG::CLog_group::GetLogEntry(char*, timespec*, GenSysTime*)’:
+./rt_debug_types.h:208:42: warning: format ‘%u’ expects argument of type ‘unsigned int’, but argument 3 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  208 |                 n=  sprintf(log_entry, "%ulld, %ud, %ud, %d, %s,  %s", t64, curr_sys_time.nf, curr_sys_time.nsf, curr_sys_time.offset,
+      |                                         ~^                             ~~~
+      |                                          |                             |
+      |                                          unsigned int                  uint64_t {aka long unsigned int}
+      |                                         %lu
+./rt_debug_types.h: At global scope:
+./rt_debug_types.h:239:35: warning: attribute ignored in declaration of ‘class RT_DEBUG::CProfileCnt’ [-Wattributes]
+  239 | alignas(CACHE_ALIGNMENT)   class  CProfileCnt
+      |                                   ^~~~~~~~~~~
+./rt_debug_types.h:239:35: note: attribute for ‘class RT_DEBUG::CProfileCnt’ must follow the ‘class’ keyword
+In file included from ./rt_debug_main.cc:15:
+./rt_debug_main.h: In member function ‘bool CDebugHandler::RTDBG_ExtractDebugData(char*)’:
+./rt_debug_main.h:202:56: warning: format ‘%u’ expects argument of type ‘unsigned int’, but argument 5 has type ‘long int’ [-Wformat=]
+  202 |                                 fprintf(fptr,"%s, %s, %ulld\n", grp_name, cnt_p->cnt_name, cnt_p->val);
+      |                                                       ~^                                   ~~~~~~~~~~
+      |                                                        |                                          |
+      |                                                        unsigned int                               long int
+      |                                                       %lu
+./rt_debug_main.h:223:71: warning: format ‘%u’ expects argument of type ‘unsigned int’, but argument 5 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  223 |                                         fprintf(fptr, "%s, %s, avg=, %ulld, max=, %ulld, last=, %ulld, max time=, %ulld, measurements=, %ulld\n",
+      |                                                                      ~^
+      |                                                                       |
+      |                                                                       unsigned int
+      |                                                                      %lu
+  224 |                                                         grp_name, prof_name, prof_tmp.average_cnt_, prof_tmp.max_cnt_, prof_tmp.last_cnt_, prof_tmp.max_cnt_time_, prof_tmp.meas_num_);
+      |                                                                              ~~~~~~~~~~~~~~~~~~~~~
+      |                                                                                       |
+      |                                                                                       uint64_t {aka long unsigned int}
+./rt_debug_main.h:223:84: warning: format ‘%u’ expects argument of type ‘unsigned int’, but argument 6 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  223 |                                         fprintf(fptr, "%s, %s, avg=, %ulld, max=, %ulld, last=, %ulld, max time=, %ulld, measurements=, %ulld\n",
+      |                                                                                   ~^
+      |                                                                                    |
+      |                                                                                    unsigned int
+      |                                                                                   %lu
+  224 |                                                         grp_name, prof_name, prof_tmp.average_cnt_, prof_tmp.max_cnt_, prof_tmp.last_cnt_, prof_tmp.max_cnt_time_, prof_tmp.meas_num_);
+      |                                                                                                     ~~~~~~~~~~~~~~~~~
+      |                                                                                                              |
+      |                                                                                                              uint64_t {aka long unsigned int}
+./rt_debug_main.h:223:98: warning: format ‘%u’ expects argument of type ‘unsigned int’, but argument 7 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  223 |                                         fprintf(fptr, "%s, %s, avg=, %ulld, max=, %ulld, last=, %ulld, max time=, %ulld, measurements=, %ulld\n",
+      |                                                                                                 ~^
+      |                                                                                                  |
+      |                                                                                                  unsigned int
+      |                                                                                                 %lu
+  224 |                                                         grp_name, prof_name, prof_tmp.average_cnt_, prof_tmp.max_cnt_, prof_tmp.last_cnt_, prof_tmp.max_cnt_time_, prof_tmp.meas_num_);
+      |                                                                                                                        ~~~~~~~~~~~~~~~~~~
+      |                                                                                                                                 |
+      |                                                                                                                                 uint64_t {aka long unsigned int}
+./rt_debug_main.h:223:116: warning: format ‘%u’ expects argument of type ‘unsigned int’, but argument 8 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  223 |                                         fprintf(fptr, "%s, %s, avg=, %ulld, max=, %ulld, last=, %ulld, max time=, %ulld, measurements=, %ulld\n",
+      |                                                                                                                   ~^
+      |                                                                                                                    |
+      |                                                                                                                    unsigned int
+      |                                                                                                                   %lu
+  224 |                                                         grp_name, prof_name, prof_tmp.average_cnt_, prof_tmp.max_cnt_, prof_tmp.last_cnt_, prof_tmp.max_cnt_time_, prof_tmp.meas_num_);
+      |                                                                                                                                            ~~~~~~~~~~~~~~~~~~~~~~
+      |                                                                                                                                                     |
+      |                                                                                                                                                     uint64_t {aka long unsigned int}
+./rt_debug_main.h:223:138: warning: format ‘%u’ expects argument of type ‘unsigned int’, but argument 9 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  223 |                                         fprintf(fptr, "%s, %s, avg=, %ulld, max=, %ulld, last=, %ulld, max time=, %ulld, measurements=, %ulld\n",
+      |                                                                                                                                         ~^
+      |                                                                                                                                          |
+      |                                                                                                                                          unsigned int
+      |                                                                                                                                         %lu
+  224 |                                                         grp_name, prof_name, prof_tmp.average_cnt_, prof_tmp.max_cnt_, prof_tmp.last_cnt_, prof_tmp.max_cnt_time_, prof_tmp.meas_num_);
+      |                                                                                                                                                                    ~~~~~~~~~~~~~~~~~~
+      |                                                                                                                                                                             |
+      |                                                                                                                                                                             uint64_t {aka long unsigned int}
+cc1plus: warning: include location "/usr/local/include" is unsafe for cross-compilation [-Wpoison-system-directories]
+In file included from /home/devops/xilinx/petalinux-v2022.1-uep60-sdk/sysroots/cortexa72-cortexa53-xilinx-linux/usr/include/unistd.h:25,
+                 from ./rt_debug_types.cc:8:
+/home/devops/xilinx/petalinux-v2022.1-uep60-sdk/sysroots/cortexa72-cortexa53-xilinx-linux/usr/include/features.h:412:4: warning: #warning _FORTIFY_SOURCE requires compiling with optimization (-O) [-Wcpp]
+  412 | #  warning _FORTIFY_SOURCE requires compiling with optimization (-O)
+      |    ^~~~~~~
+In file included from ./rt_debug_types.cc:10:
+./rt_debug_types.h: In member function ‘bool RT_DEBUG::CLog_group::GetLogEntry(char*, timespec*, GenSysTime*)’:
+./rt_debug_types.h:208:42: warning: format ‘%u’ expects argument of type ‘unsigned int’, but argument 3 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  208 |                 n=  sprintf(log_entry, "%ulld, %ud, %ud, %d, %s,  %s", t64, curr_sys_time.nf, curr_sys_time.nsf, curr_sys_time.offset,
+      |                                         ~^                             ~~~
+      |                                          |                             |
+      |                                          unsigned int                  uint64_t {aka long unsigned int}
+      |                                         %lu
+./rt_debug_types.h: At global scope:
+./rt_debug_types.h:239:35: warning: attribute ignored in declaration of ‘class RT_DEBUG::CProfileCnt’ [-Wattributes]
+  239 | alignas(CACHE_ALIGNMENT)   class  CProfileCnt
+      |                                   ^~~~~~~~~~~
+./rt_debug_types.h:239:35: note: attribute for ‘class RT_DEBUG::CProfileCnt’ must follow the ‘class’ keyword
+./rt_debug_types.cc: In member function ‘bool RT_DEBUG::CTraceGroup::GetTraceEntry(char*, timespec*, GenSysTime*)’:
+./rt_debug_types.cc:128:40: warning: format ‘%u’ expects argument of type ‘unsigned int’, but argument 3 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  128 |         n=  sprintf(trace_entry_str, "%ulld, %d, %d, %d, %s, %d, %d, ", t64, curr_sys_time.nf, curr_sys_time.nsf, curr_sys_time.offset,
+      |                                       ~^                                ~~~
+      |                                        |                                |
+      |                                        unsigned int                     uint64_t {aka long unsigned int}
+      |                                       %lu
+/usr/local/include:/usr/local/include:/usr/local/include:/usr/local/include:
+rt_debug_main.o rt_debug_types.o
+aarch64-xilinx-linux-ar -rc bin/librtdebug.a rt_debug_main.o rt_debug_types.o    

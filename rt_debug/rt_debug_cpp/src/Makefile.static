@@ -1,7 +1,8 @@
 
-# compile mesh classes
+
 NAME = librtdebug
-ROOT = ../../COMMON
+ROOT = ../../
+H_INC_DIR:= ../api/
 LIB_TYPE:=STATIC
-include $(ROOT)/Make/build.mk
+include $(ROOT)/make/build.mk
 
