@@ -231,14 +231,14 @@ struct Complex64
     int64_t im;
 };
 
-struct GenSysTime
+typedef struct
 {
 	uint16_t nf;
 	uint16_t nsf;
 	int32_t offset;
-};
+}GenSysTime;
 
-struct ProfileData
+typedef struct
 {
 	uint64_t max_cnt_;
 	uint64_t max_cnt_time_;
@@ -246,7 +246,7 @@ struct ProfileData
 	uint64_t average_cnt_;
 	uint64_t meas_num_;
 	uint64_t fill_cache_line_align[3];
-};
+}ProfileData;
 
 
 #ifdef __cplusplus

@@ -45,15 +45,15 @@ int RT_debug_init(char *mem_map_file);
 //Add trace data
 int RT_debug_save_trace(enum EGroupTrace id, int line, uint64_t val0, uint64_t val1, uint64_t val2, uint64_t val3);
 //Save log data
-int RT_debug_save_log(enum E_GROUPS id, int line, char* log_str);
+void RT_debug_save_log(enum E_GROUPS id, int line, char* log_str);
 
 //Get event counter
-volatile uint64_t* RT_debug_get_event_cnt(enum EGroupEvent id);
+volatile uint64_t* RT_debug_get_event_cnt(int group_name);
 
 //Start profiling measurement
-void RT_debug_prof_start(enum EGroupProfile id);
+void RT_debug_prof_start(int group_prof);
 //Stop profiling measurement
-void RT_debug_prof_stop(enum EGroupProfile id);
+void RT_debug_prof_stop(int group_prof);
 
 //Extract profiler data
 bool RT_debug_get_prof_data(enum EGroupProfile id, ProfileData *prof_ptr);

@@ -125,7 +125,7 @@ bool	  	CDebugHandler::RTDBG_AttachDebugData()
     return true;
   }
 
-bool        CDebugHandler::RTDBG_GetTraceEntry(char *trace_entry_str, timespec *linux_time)
+bool        CDebugHandler::RTDBG_GetTraceEntry(char *trace_entry_str, struct timespec *linux_time)
 {
 	uint32_t i, ii;
 	uint32_t n, n1, min_index= -1;
@@ -220,7 +220,7 @@ EXTERN_C void RTDBG_AddLog(HANDLER debug_grp, GenSysTime *sys_time, char *log_st
 {
 	return debug_handler.RTDBG_AddLog(debug_grp, sys_time, log_str);
 }
-EXTERN_C  bool RTDBG_GetLog(char *log_str, timespec *linux_time, uint64_t grp_mask)
+EXTERN_C  bool RTDBG_GetLog(char *log_str, struct timespec *linux_time, uint64_t grp_mask)
 {
 	return debug_handler.RTDBG_GetLog(log_str, linux_time, grp_mask);
 }

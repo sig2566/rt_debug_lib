@@ -18,6 +18,7 @@ CC1 :=$(CC)
 ifeq ($(CC),)
 	CC=gcc 
 	CPP=g++ 
+	@echo $(CC)
 endif
 #ARCH_DEF = -DARCH=X86
 OBJ := obj

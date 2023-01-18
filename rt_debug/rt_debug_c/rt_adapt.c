@@ -24,35 +24,35 @@ int group_indexes[MAX_GROUPS];
 
 //Define events
 
-struct SGroupEvent
+typedef struct
 {
 	int group_id;
 	volatile uint64_t* event_cnt;
 	char event_name[TRACE_STRING_SIZE];
-}
+}SGroupEvent;
 
-struct SGroupEvent group_events[MAX_GROUP_EVENT];
+SGroupEvent group_events[MAX_GROUP_EVENT];
 
 //Define traces
 
-struct SGroupTrace
+typedef struct SGroupTrace
 {
 	enum E_GROUPS  group_id;
 	int  trace_id;
 
-};
+}SGroupTrace;
 
-struct SGroupTrace traces[MAX_TRACES] = {0};
+SGroupTrace traces[MAX_TRACES] = {0};
 
 //Profiler definition
 
-struct SGroupProfiler
+typedef struct
 {
 	enum E_GROUPS  group_id;
 	int  profile_id;
-};
+}SGroupProfiler;
 
-struct SGroupProfiler prof_points[MAX_PROFILER];
+SGroupProfiler prof_points[MAX_PROFILER];
 
 int file_exists (char *filename) {
   struct stat   buffer;
@@ -111,7 +111,7 @@ int RT_debug_save_trace(enum EGroupTrace id, int line, uint64_t val0, uint64_t v
 	return 0;
 }
 //Save log data
-int RT_debug_save_log(enum E_GROUPS id, int line, char* log_str)
+void RT_debug_save_log(enum E_GROUPS id, int line, char* log_str)
 {
 	return RTDBG_AddLog(group_names[id], NULL, log_str);
 }
@@ -139,7 +139,8 @@ bool RT_debug_get_prof_data(enum EGroupProfile id, ProfileData *prof_ptr)
 {
 	int group_id= prof_points[id].group_id;
 	int prof_id= prof_points[id].profile_id;
-	return RTDBG_GetProfInfo(group_id, prof_id, prof_ptr);
+	char gr_name[80], prof_name[80];
+	return RTDBG_GetProfInfo(group_id, prof_id, prof_ptr, gr_name, prof_name);
 }
 
 
@@ -164,7 +165,7 @@ bool RT_debug_get_grp_log(int group_id, char *log_str)
 {
 	if(log_str==NULL)
 	{
-		printf("ERROR: log_str is point to NULL in the RT_debug_get_grp_log function\n")
+		printf("ERROR: log_str is point to NULL in the RT_debug_get_grp_log function\n");
 				return false;
 	}
 	if(group_id>MAX_GROUP_NUM-1)

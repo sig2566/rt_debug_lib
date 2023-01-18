@@ -10,7 +10,7 @@
 #ifndef TOOLS_TRACER_RT_DEBUG_API_H_
 #define TOOLS_TRACER_RT_DEBUG_API_H_
 
-
+#include <time.h>
 #include "i_sys_types.h"
 //#include "common_typedef.h"
 #include "i_sys_utils.h"
@@ -18,7 +18,7 @@
 #ifdef __cplusplus
 extern "C" {
 #else
-#define alignas(X) __attribute__((aligned(x)))
+#define alignas(X) __attribute__((aligned(X)))
 #endif
 #define TRACE_STRING_SIZE (128)
 #define DEFAULT_TRACE_ID (0)
@@ -30,11 +30,11 @@ typedef enum
 	RTDBG_STOPPED
 } RTDBG_STATUS_T;
 typedef uint32_t HANDLER;
-struct RT_counter
+typedef struct
 {
 	alignas(CACHE_ALIGNMENT) volatile int64_t val;
 	char							  cnt_name[TRACE_STRING_SIZE];
-};
+}RT_counter;
 
 //Counter API -- Support event counters
 //Returns the counter structure
@@ -51,7 +51,7 @@ uint32_t    RTDBG_GetCountersNum(HANDLER debug_grp);
 void 		RTDBG_AddTrace(HANDLER debug_grp, uint32_t trace_id, uint32_t line_num, GenSysTime *sys_time, uint64_t var0 , uint64_t var1, uint64_t var2, uint64_t var3);
 
 //Extract the earliest trace entry
-bool        RTDBG_GetTraceEntry(char *trace_entry_str, timespec *linux_time);
+bool        RTDBG_GetTraceEntry(char *trace_entry_str, struct timespec *linux_time);
 
 //Add new trace entry with presentation printf like format 'format' To the group trace formats data.
 uint32_t    RTDBG_AddTraceEntry(HANDLER grp, char* format);
@@ -61,7 +61,7 @@ uint32_t    RTDBG_AddTraceEntry(HANDLER grp, char* format);
 void RTDBG_AddLog(HANDLER debug_grp, GenSysTime *sys_time, char *log_str);
 
 //Extract the earliest log
-bool RTDBG_GetLog(char *log_strm, timespec *linux_time, uint64_t grp_mask);
+bool RTDBG_GetLog(char *log_strm, struct timespec *linux_time, uint64_t grp_mask);
 
 //Profiler support
 //Allocate new profiling entry with name prof_name
