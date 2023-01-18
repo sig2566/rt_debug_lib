@@ -27,7 +27,7 @@ enum EGroupEvent
 };
 
 #undef DEF_TRACE
-#define DEF_TRACE(a, b,c) a##_##c.
+#define DEF_TRACE(a, b,c) a##_##b,
 enum EGroupTrace{
 #include "traces.inc"
 	MAX_TRACES

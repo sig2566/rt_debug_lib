@@ -9,6 +9,7 @@
 
 #ifndef TOOLS_TRACER_RT_DEBUG_MAIN_H_
 #define TOOLS_TRACER_RT_DEBUG_MAIN_H_
+#include <sys/mman.h>
 #include "rt_debug_types.h"
 
 using namespace RT_DEBUG;

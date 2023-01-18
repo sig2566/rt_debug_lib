@@ -1,5 +1,5 @@
 /******************************************************************
- * rt_debug_api.h.h
+ * rt_debug_api.h
  * Author: Igor Shoihet
  * Copyright (c) 2018 - 2020 Airspan Networks
  * All Rights Reserved.
@@ -9,19 +9,7 @@
 
 #ifndef TOOLS_TRACER_RT_DEBUG_API_H_
 #define TOOLS_TRACER_RT_DEBUG_API_H_
-#include <cstdio>
-#include <cstdlib>
-#include <cassert>
-#include <limits.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <dlfcn.h>
-#include <string.h>
-#include <unistd.h>
-#include <iostream>
-#include <sstream>
-#include <errno.h>
+
 
 #include "i_sys_types.h"
 //#include "common_typedef.h"
@@ -29,6 +17,8 @@
 
 #ifdef __cplusplus
 extern "C" {
+#else
+#define alignas(X) __attribute__((aligned(x)))
 #endif
 #define TRACE_STRING_SIZE (128)
 #define DEFAULT_TRACE_ID (0)

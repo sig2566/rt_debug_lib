@@ -8,14 +8,14 @@
 #include <sys/stat.h>   // stat
 #include <stdbool.h>    // bool type
 #include <stdio.h>
-
+#include <assert.h>
 #include "rt_debug_api.h"
 #include "rt_debug_adap_api.h"
 //Define groups
 
 #undef DEF_GROUP
-#define DEF_GROUP(a) #a,
-char group_names[]=
+#define DEF_GROUP(a) (char*)#a,
+char *group_names[]=
 {
 #include "groups.inc"
 "MAX_GROUPS"
