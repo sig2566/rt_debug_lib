@@ -14,11 +14,11 @@
 #include "i_sys_types.h"
 //#include "common_typedef.h"
 #include "i_sys_utils.h"
-
+#define alignas(X) __attribute__((aligned(X)))
 #ifdef __cplusplus
 extern "C" {
 #else
-#define alignas(X) __attribute__((aligned(X)))
+//#define alignas(X) __attribute__((aligned(X)))
 #endif
 #define TRACE_STRING_SIZE (128)
 #define DEFAULT_TRACE_ID (0)

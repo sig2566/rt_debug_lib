@@ -1,0 +1,9 @@
+
+
+NAME = rt_lib_example
+ROOT = ../
+H_INC_DIR:= ../api/ ../rt_debug_cpp/api ../../rt_debug/cust_api
+LIB_TYPE:=EXEC
+LIB= -L ../rt_debug_cpp/bin -l rtdebug -L ../rt_debug_c/bin -l  rtdebugadap
+include $(ROOT)/make/build.mk
+

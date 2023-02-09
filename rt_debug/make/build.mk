@@ -14,12 +14,10 @@ OSTYPE	:= $(shell uname)
 SRC_INC :=  $(shell find $(H_INC_DIR) -type f -name "*.inc")
 
 #Set hard coded build environment if it was not set before
-CC1 :=$(CC)
-ifeq ($(CC),)
-	CC=gcc 
-	CPP=g++ 
-	@echo $(CC)
-endif
+CC ?= gcc
+CXX ?= g++
+CPP := $(CXX)
+
 #ARCH_DEF = -DARCH=X86
 OBJ := obj
 BIN := bin
@@ -35,8 +33,10 @@ DEBFLAGS:=-O3 -g -DDEBUG
 else
 DEBFLAGS :=-g -O0 -DDEBUG 
 endif
+CPPFLAGS:= $(CFLAGS_ADD) $(DEBFLAGS) -std=c++11
+CFLAGS:= $(CFLAGS_ADD) $(DEBFLAGS) -std=c11
 # All Target
-all: CFLAGS:= $(CFLAGS_ADD) $(DEBFLAGS)
+#all: 
 all: lib
 
 
@@ -49,7 +49,7 @@ SRC_H := $(SRC_H) $(SRC_H_MODULE)
 
 
 OBJECTS_CPP := $(notdir $(SRC_CPP:.cc=.o))
-OBJECTS_C := $(notdir $(patsubst %.c,%.o,$(SRC_C)))
+OBJECTS_C := $(notdir $(SRC_C:.c=.o))
 
 H_INC_DIR := $(H_INC_DIR) $(ROOT)/api
 
@@ -61,11 +61,21 @@ endif
 H_INCLUDE = $(OPT_H) $(INC_FLAGS) $(patsubst %, -I%, $(H_INC_DIR))
 LIB_TYPE?=DYNAMIC
 ifeq (STATIC, $(LIB_TYPE))
-BUILD_TARGET:=
-LINK_TOOL:=$(AR) -rc $(BIN)/$(NAME).a
+	BUILD_TARGET:=
+	LINK_TOOL:=$(AR) -rc $(BIN)/$(NAME).a
 else
-LINK_TOOL:= $(CPP) -shared -Wl,--export-dynamic
-BUILD_TARGET:=-o $(BIN)/$(NAME).so
+	ifeq (DYNAMIC, $(LIB_TYPE))
+		LINK_TOOL:= $(CPP) -shared -Wl,--export-dynamic
+		BUILD_TARGET:=-o $(BIN)/$(NAME).so
+	else
+		ifeq (EXEC, $(LIB_TYPE))
+			LINK_TOOL:= $(CPP) 
+			BUILD_TARGET:=-o $(BIN)/$(NAME)
+		else
+			@echo "Wrong device selected"
+		endif
+	endif		
+	
 endif
 CC3 :=$(CC)
 
@@ -73,26 +83,19 @@ lib : $(OBJECTS_CPP) $(OBJECTS_C)
 	@echo $(CPATH)
 	@echo $(OBJECTS_CPP) $(OBJECTS_C)
 	@test -d $(BIN) || mkdir -p $(BIN) 
-	$(LINK_TOOL) $(OBJECTS_CPP) $(OBJECTS_C) $(LIB_SO)  $(BUILD_TARGET)
+	$(LINK_TOOL) $(OBJECTS_CPP) $(OBJECTS_C) $(LIB)  $(BUILD_TARGET)
  
 $(OBJECTS_CPP): $(SRC_CPP) $(SRC_H) $(SRC_INC)
 	@echo $(SRC_CPP) $(H_INCLUDE)
-	@echo $(OBJECTS_CPP)
-	@echo "CPP $(CPP)"
-	@echo "CC1 $(CC1)"
-	@echo "CC2 $(CC2)"
-	@echo "CC3 $(CC3)"		
 	@test -d $(OBJ) || mkdir -p $(OBJ) 
-	$(CC) $(H_INCLUDE) $(VERDEF) $(ARCH_DEF) $(CFLAGS)  -fPIC -c $(SRC_CPP)
+	$(CC) $(H_INCLUDE) $(VERDEF) $(ARCH_DEF) $(CPPFLAGS)  -fPIC -c $(SRC_CPP)
 
 $(OBJECTS_C): $(SRC_C) $(SRC_H) $(SRC_INC)
 	@echo $(SRC_C) $(SRC_H)
-	@echo $(OBJECTS_C)
 	@test -d $(OBJ) || mkdir -p $(OBJ) 
 	$(CC)  $(H_INCLUDE) $(VERDEF) $(ARCH_DEF) $(CFLAGS)  -fPIC -c $(SRC_C)
 
 .PHONY: clean
 clean:
 	rm *o || true
-	rm $(BIN)/$(NAME).so || true
-	rm $(BIN)/$(NAME).a || true
+	rm $(BIN)/* || true

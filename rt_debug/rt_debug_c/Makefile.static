@@ -1,0 +1,8 @@
+
+
+NAME = librtdebugadap
+ROOT = ../
+H_INC_DIR:= ../api/ ../rt_debug_cpp/api ../../rt_debug/cust_api
+LIB_TYPE:=STATIC
+include $(ROOT)/make/build.mk
+

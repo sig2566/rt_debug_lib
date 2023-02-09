@@ -236,7 +236,7 @@ enum EProfileEval_type
 	CYCLE_EVAL
 };
 
-alignas(CACHE_ALIGNMENT)   class  CProfileCnt
+alignas(CACHE_ALIGNMENT) class  CProfileCnt
 {
 
 	ProfilerCntD prof_cnt_;
