@@ -9,6 +9,8 @@
 #define API_RT_DEBUG_ADAP_API_H_
 #ifdef __cplusplus
 extern "C" {
+#else
+#define bool uint32_t
 #endif
 #undef DEF_GROUP
 #define DEF_GROUP(a)  a,

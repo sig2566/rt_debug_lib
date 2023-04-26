@@ -8,6 +8,7 @@
 #include <sys/stat.h>   // stat
 #include <stdbool.h>    // bool type
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 #include "rt_debug_api.h"
 #include "rt_debug_adap_api.h"
@@ -85,8 +86,9 @@ int RT_debug_init(char *mem_map_file)
 #undef DEF_EVENT
 // a- grop name, b -- event name
 #define DEF_EVENT(a,b) group_events[a##_##b].group_id= group_indexes[a];\
-	srtncpy(group_events[a##_##b].event_name, #b, TRACE_STRING_SIZE-1);\
-    group_events[a##_##b].event_cnt = RTDBG_AllocCounter(group_indexes[a], #b);
+	{char tmp[]= #b;\
+	strncpy(group_events[a##_##b].event_name, tmp, TRACE_STRING_SIZE-1);\
+    group_events[a##_##b].event_cnt = RTDBG_AllocCounter(group_indexes[a], #b);}
 #include "events.inc"
 
  // Traces
