@@ -73,6 +73,8 @@ int RT_debug_init(char *mem_map_file)
     else
     {
         printf("Create and initialize the %s file\n", mem_map_file);
+        RTDBG_SetSharedMemFile(mem_map_file);
+        RTDBG_ActivateDebugDataCollection();
         RTDBG_Start();
     }
 

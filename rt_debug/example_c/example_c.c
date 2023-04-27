@@ -21,6 +21,8 @@ enum PROG_ACTION{
 	E_EXTRACT,
 	E_MAX_ACTION
 };
+
+static char rt_debug_out[100] = "/tmp/rt_debug.txt";
 void print_help()
 {
 	printf("Test program for the RT debug library\n\
@@ -75,13 +77,15 @@ void RunMonitor()
 
 void ExtractData()
 {
+	RT_debug_ExtractDebugData(rt_debug_out);
 }
 
 int main(int argc, char *argv[]) {
 
 	enum PROG_ACTION tst_action = E_NONE;
-	char rt_debug_data[100]= "/tmp/rt_debug.dat", rt_debug_out[100] = "/tmp/rt_debug.txt";
+	char rt_debug_data[100]= "/tmp/rt_debug.dat";
 	puts("!!!RT debug library running test!!!"); /* prints !!!Hello World!!! */
+	RT_debug_init(rt_debug_data);
     size_t optind;
     for (optind = 1; optind < argc && argv[optind][0] == '-'; optind++) {
         switch (argv[optind][1]) {

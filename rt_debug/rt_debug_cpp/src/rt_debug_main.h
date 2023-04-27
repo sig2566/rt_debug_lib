@@ -172,7 +172,7 @@ public:
 	}
 	void 		RTDBG_SetSharedMemFile(char* mem_mapped_file)
 	{
-		sprintf(shared_file_name_,"/tmp/%s", mem_mapped_file);
+		sprintf(shared_file_name_,"%s", mem_mapped_file);
 	}
 	bool	RTDBG_ExtractDebugData(char *out_file)
 	{
