@@ -36,13 +36,18 @@ Theare the options of the running:\n\
 }
 void WorkThread(void* param)
 {
-	const int num_iter= 1000;
+	const int num_iter= 10000;
 	int i;
 	int *delay= (int*)param;
+	//RTDBG_START_PROF(GEN_GROUP, TST_PROF);
 	for(i=0; i < num_iter; i++)
 	{
+		//RTDBG_START_PROF(GEN_GROUP, UI_PROF);
+		RTDBG_SAVE_TRACE(GEN_GROUP, PASSED, i, 0, 0, 0);
 		usleep(*delay);
+		//RTDBG_STOP_PROF(GEN_GROUP, UI_PROF);
 	}
+	//RTDBG_STOP_PROF(GEN_GROUP, TST_PROF);
 }
 void Init()
 {
@@ -60,7 +65,7 @@ void Run_application()
 		int delay= delay_avg+ rand()%delay_diff_max;
 	    printf("Before Thread\n");
 	    pthread_create(&tid[i], NULL, WorkThread, (void*)&delay);
-	    RTDBG_SAVE_TRACE(GEN_GROUP, HW_WRITE, i, 0, 0, 0);
+	    RTDBG_SAVE_TRACE(INIT_GROUP, CREATE_THREAD, i, (uint32_t)tid[i], 0, 0);
 	}
 	for(i=0;i<thread_num;i++)
 	{

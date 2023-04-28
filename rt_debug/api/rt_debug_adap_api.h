@@ -80,10 +80,10 @@ bool RT_debug_get_grp_log(int group_id, char *log_str);
 #define RTDBG_SAVE_LOG(grp_name, l) RT_debug_save_log(grp_name, __LINE__, l);
 
 //Start profiling
-#define RTDBG_START_PROF(grp_name, prof_name) RT_debug_prof_start(grp_name##_prof_name);
+#define RTDBG_START_PROF(grp_name, prof_name) RT_debug_prof_start(grp_name##_##prof_name);
 
 //Stop profiling
-#define RTDBG_STOP_PROF(grp_name, prof_name) RT_debug_prof_stop(grp_name##_prof_name);
+#define RTDBG_STOP_PROF(grp_name, prof_name) RT_debug_prof_stop(grp_name##_##prof_name);
 
 //Get event counter
 #define RTDBG_GET_EVENT_CNTR_PTR(grp_name, event_name)  \
