@@ -39,15 +39,16 @@ void WorkThread(void* param)
 	const int num_iter= 10000;
 	int i;
 	int *delay= (int*)param;
-	//RTDBG_START_PROF(GEN_GROUP, TST_PROF);
+	ProfilePoint prof_task;
+	RTDBG_INIT_PROF(GEN_GROUP, UI_PROF, &prof_task, 500);
 	for(i=0; i < num_iter; i++)
 	{
-		//RTDBG_START_PROF(GEN_GROUP, UI_PROF);
+		RTDBG_START_PROF(GEN_GROUP, UI_PROF, &prof_task);
 		RTDBG_SAVE_TRACE(GEN_GROUP, PASSED, i, 0, 0, 0);
 		usleep(*delay);
-		//RTDBG_STOP_PROF(GEN_GROUP, UI_PROF);
+		RTDBG_STOP_PROF(GEN_GROUP, UI_PROF, &prof_task);
 	}
-	//RTDBG_STOP_PROF(GEN_GROUP, TST_PROF);
+	RTDBG_FLUSH_DATA_PROF(GEN_GROUP, TST_PROF, &prof_task);
 }
 void Init()
 {

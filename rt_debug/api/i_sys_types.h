@@ -238,15 +238,38 @@ typedef struct
 	int32_t offset;
 }GenSysTime;
 
+typedef enum
+{
+	TIME_EVAL,
+	CYCLE_EVAL
+}EProfileEval_type;
+// in bytes
+#define CACHE_ALIGNMENT			(64)
+#define alignas(X) __attribute__((aligned(X)))
 typedef struct
 {
-	uint64_t max_cnt_;
+	alignas(CACHE_ALIGNMENT) uint64_t max_cnt_;
 	uint64_t max_cnt_time_;
 	uint64_t last_cnt_;
 	uint64_t average_cnt_;
 	uint64_t meas_num_;
-	uint64_t fill_cache_line_align[3];
-}ProfileData;
+
+
+} ProfileData;
+typedef struct
+{
+	ProfileData prof_data;
+
+	uint64_t acc_cnt_; //Support multiple start stop during one measurement
+	uint32_t cnt_id_;
+	uint32_t max_calls_;
+	uint64_t start_val_;
+	uint64_t delta_;
+	uint32_t	prof_id;
+	EProfileEval_type 	evalType_;
+	void *mem_ptr_;
+
+}ProfilePoint;
 
 
 #ifdef __cplusplus

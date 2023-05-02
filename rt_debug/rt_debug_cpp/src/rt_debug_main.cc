@@ -230,14 +230,25 @@ EXTERN_C uint32_t  	RTDBG_AddProfiler(HANDLER debug_grp, char *prof_name)
 {
 	return debug_handler.RTDBG_AddProfiler(debug_grp, prof_name);
 }
-EXTERN_C void		RTDBG_StartProfMeas(HANDLER debug_grp, uint32_t prof_id)
+
+EXTERN_C void	RTDBG_ProfInit(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point, int meas_cnt)
 {
-	debug_handler.RTDBG_StartProfMeas(debug_grp, prof_id);
+	debug_handler.RTDBG_ProfInit(debug_grp, prof_id, prof_point, meas_cnt);
+}
+
+EXTERN_C void	RTDBG_ProfFlushMeas(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point)
+{
+	debug_handler.RTDBG_ProfFlushMeas(debug_grp, prof_id, prof_point);
+}
+
+EXTERN_C void		RTDBG_StartProfMeas(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point)
+{
+	debug_handler.RTDBG_StartProfMeas(debug_grp, prof_id, prof_point);
 
 }
-EXTERN_C void	RTDBG_StopProfMeas(HANDLER debug_grp, uint32_t prof_id)
+EXTERN_C void	RTDBG_StopProfMeas(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point)
 {
-	return debug_handler.RTDBG_StopProfMeas(debug_grp, prof_id);
+	return debug_handler.RTDBG_StopProfMeas(debug_grp, prof_id, prof_point);
 }
 
 EXTERN_C bool		RTDBG_GetProfInfo(HANDLER debug_grp, uint32_t prof_id, ProfileData *prof_data, char *grp_name, char* prof_name)
@@ -245,9 +256,9 @@ EXTERN_C bool		RTDBG_GetProfInfo(HANDLER debug_grp, uint32_t prof_id, ProfileDat
 	return debug_handler.RTDBG_GetProfInfo(debug_grp, prof_id, prof_data, grp_name, prof_name);
 }
 
-EXTERN_C void		RTDBG_StopStartProfMeas(HANDLER debug_grp, uint32_t prof_id)
+EXTERN_C void		RTDBG_StopStartProfMeas(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point)
 {
-	return debug_handler.RTDBG_StopStartProfMeas(debug_grp, prof_id);
+	return debug_handler.RTDBG_StopStartProfMeas(debug_grp, prof_id, prof_point);
 }
 //General RT Debug API
 EXTERN_C void        RTDBG_Init()
@@ -259,9 +270,9 @@ EXTERN_C HANDLER     RTDBG_AllocRTDebugGroup(char* group_name)
 	return debug_handler.RTDBG_AllocRTDebugGroup(group_name);
 }
 
-EXTERN_C void RTDBG_PutProfVal(HANDLER debug_grp, uint32_t prof_id, uint64_t *val)
+EXTERN_C void RTDBG_PutProfVal(HANDLER debug_grp, uint32_t prof_id, uint64_t *val, ProfilePoint *prof_point)
 {
-	return debug_handler.RTDBG_PutProfVal(debug_grp, prof_id, val);
+	return debug_handler.RTDBG_PutProfVal(debug_grp, prof_id, val, prof_point);
 }
 //Return the name of the group debug_grp
 EXTERN_C bool	RTDBG_GetGrpName(HANDLER debug_grp, char  *grp_name)

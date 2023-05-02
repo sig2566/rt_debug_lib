@@ -28,8 +28,6 @@ extern "C" {
  */
 #define UNIX
 
-// in bytes
-#define CACHE_ALIGNMENT			(64)
 
 // align the size to the nearest aligned value
 #define ALIGN_SIZE(x, ALIGNMENT_VALUE) (((x)+ALIGNMENT_VALUE-1)&(~(ALIGNMENT_VALUE-1)))

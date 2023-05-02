@@ -124,22 +124,35 @@ volatile uint64_t* RT_debug_get_event_cnt(int group_name)
 {
 	return group_events[group_name].event_cnt;
 }
-
-void RT_debug_prof_start(int group_prof)
+//Init profiling measurement point
+void RT_debug_prof_init(int group_prof, ProfilePoint* prof, int meas_cnt)
 {
 	int group_id= prof_points[group_prof].group_id;
 	int prof_id= prof_points[group_prof].profile_id;
-	return RTDBG_StartProfMeas(group_id, prof_id);
+	RTDBG_ProfInit(group_id, prof_id, prof, meas_cnt);
 }
-void RT_debug_prof_stop(int group_prof)
+//Flush the profiling data when the profiling measurement is stopped
+void RT_debug_prof_flush(int group_prof, ProfilePoint* prof)
 {
 	int group_id= prof_points[group_prof].group_id;
 	int prof_id= prof_points[group_prof].profile_id;
-	return RTDBG_StopProfMeas(group_id, prof_id);
+	RTDBG_ProfFlushMeas(group_id, prof_id, prof);
+}
+void RT_debug_prof_start(int group_prof, ProfilePoint* prof)
+{
+	int group_id= prof_points[group_prof].group_id;
+	int prof_id= prof_points[group_prof].profile_id;
+	return RTDBG_StartProfMeas(group_id, prof_id, prof);
+}
+void RT_debug_prof_stop(int group_prof, ProfilePoint* prof)
+{
+	int group_id= prof_points[group_prof].group_id;
+	int prof_id= prof_points[group_prof].profile_id;
+	return RTDBG_StopProfMeas(group_id, prof_id, prof);
 }
 
 //Extract profiler data
-bool RT_debug_get_prof_data(enum EGroupProfile id, ProfileData *prof_ptr)
+bool RT_debug_get_prof_data(int id, ProfileData *prof_ptr)
 {
 	int group_id= prof_points[id].group_id;
 	int prof_id= prof_points[id].profile_id;

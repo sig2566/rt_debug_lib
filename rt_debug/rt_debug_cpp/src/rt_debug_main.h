@@ -338,36 +338,42 @@ public:
 		CProfilerGroup* grp_profp = grp_p->GetProfiler();
 		return grp_profp->RegistryProfileEntry(prof_name);
 	}
-	//Collection profiler messages .
-	CProfileCnt* GetProfilerCnt(HANDLER debug_grp, uint32_t prof_id)
+	void	RTDBG_ProfInit(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point, int meas_cnt)
 	{
 		CGroupDebugRT* grp_p= rt_debugp_->GetDebugGrp(debug_grp);
 		CProfilerGroup* grp_profp = grp_p->GetProfiler();
-		CProfileCnt *prof_ptr= grp_profp->GetProfCounter(prof_id);
-		assert(prof_ptr!=NULL);
-		return prof_ptr;
+		CProfileCnt *prof_ptr= static_cast<CProfileCnt*>(prof_point);
+		prof_ptr->Init(grp_profp->GetProfEntryFifo(prof_id), meas_cnt);
+
 	}
-	void		RTDBG_StartProfMeas(HANDLER debug_grp, uint32_t prof_id)
+
+	void	RTDBG_ProfFlushMeas(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point)
 	{
-		CProfileCnt *prof_ptr= GetProfilerCnt(debug_grp, prof_id);
+		CProfileCnt *prof_ptr= static_cast<CProfileCnt*>(prof_point);
+		prof_ptr->Update();
+	}
+	void  RTDBG_StartProfMeas(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point)
+	{
+		CProfileCnt *prof_ptr= static_cast<CProfileCnt*>(prof_point);
+
 		prof_ptr->Start();
 
 	}
-	void		RTDBG_StopProfMeas(HANDLER debug_grp, uint32_t prof_id)
+	void RTDBG_StopProfMeas(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point)
 	{
-		CProfileCnt *prof_ptr= GetProfilerCnt(debug_grp, prof_id);
+		CProfileCnt *prof_ptr= static_cast<CProfileCnt*>(prof_point);
 		prof_ptr->Stop();
 	}
 
-	void		RTDBG_PutProfVal(HANDLER debug_grp, uint32_t prof_id, uint64_t *val)
+	void		RTDBG_PutProfVal(HANDLER debug_grp, uint32_t prof_id, uint64_t *val, ProfilePoint *prof_point)
 	{
-		CProfileCnt *prof_ptr= GetProfilerCnt(debug_grp, prof_id);
+		CProfileCnt *prof_ptr= static_cast<CProfileCnt*>(prof_point);
 		prof_ptr->Stop(val);
 	}
 
-	void		RTDBG_StopStartProfMeas(HANDLER debug_grp, uint32_t prof_id)
+	void		RTDBG_StopStartProfMeas(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point)
 	{
-		CProfileCnt *prof_ptr= GetProfilerCnt(debug_grp, prof_id);
+		CProfileCnt *prof_ptr= static_cast<CProfileCnt*>(prof_point);
 		prof_ptr->StopContinue();
 	}
 

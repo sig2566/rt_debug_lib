@@ -230,58 +230,39 @@ struct ProfilerCntD : public ProfileData
 };
 
 
-enum EProfileEval_type
+
+alignas(CACHE_ALIGNMENT) class  CProfileCnt : public ProfilePoint
 {
-	TIME_EVAL,
-	CYCLE_EVAL
-};
-
-alignas(CACHE_ALIGNMENT) class  CProfileCnt
-{
-
-	ProfilerCntD prof_cnt_;
-	uint64_t acc_cnt_; //Support multiple start stop during one measurement
-	uint32_t cnt_id_;
-	uint32_t max_calls_;
-	uint64_t start_val_;
-	uint64_t delta_;
-	uint32_t	prof_id = -1;
-	CProfileCnt  *next_prof_p;
-	EProfileEval_type 	evalType_;
-	CMemArea *mem_ptr_ = NULL;
-
 
 public:
-CProfileCnt()
+void ResetProfData()
 {
+	prof_data.max_cnt_ = prof_data.last_cnt_ = prof_data.average_cnt_ = prof_data.max_cnt_time_ = 0;
+	prof_data.meas_num_ = 0;
+}
+void ResetInit()
+{
+	ResetProfData();
 	cnt_id_ =0;
-	prof_cnt_.Reset();
 	max_calls_= 500;
 	acc_cnt_ = 0;
 	start_val_ = 0;
 	delta_ = 0;
-	next_prof_p = NULL;
 	evalType_ = TIME_EVAL;//TIME_EVAL;//CYCLE_EVAL;
-}
-CProfileCnt* GetNextProf()
-{
-	return next_prof_p;
-}
-void ConnectProf(CProfileCnt *prof_addr)
-{
-	next_prof_p = prof_addr;
+	prof_id = -1;
+	mem_ptr_ = NULL;
 }
 
 void SetMaxCalls(uint32_t val)
 {
 	max_calls_= val;
 }
-void Init(char *name, CMemArea *mem_ptr)
+void Init(CMemArea *mem_ptr, uint32_t max_count= 500)
 {
 	struct timespec t1, t0;
-	mem_ptr_ = mem_ptr;
-	prof_cnt_.Reset();
-	Reset();
+
+	ResetInit();
+	mem_ptr_ = (void*)mem_ptr;
 	if(evalType_ == TIME_EVAL)
 	{
 		int8_t number_delta_calls_iterations = 10;
@@ -311,23 +292,23 @@ void Init(char *name, CMemArea *mem_ptr)
 void Update()
 {
 	ProfilerCntD tmp;
-	if(prof_cnt_.meas_num_ == 0)
+	if(prof_data.meas_num_ == 0)
 		return;
-	prof_cnt_.average_cnt_ = prof_cnt_.average_cnt_/prof_cnt_.meas_num_;
-
-	while(mem_ptr_->PushFIFO_MT(&prof_cnt_, sizeof(prof_cnt_))==E_FAIL )
+	prof_data.average_cnt_ = prof_data.average_cnt_/prof_data.meas_num_;
+	CMemArea* mem_ptr = (CMemArea*)mem_ptr_;
+	while(mem_ptr->PushFIFO_MT(&prof_data, sizeof(prof_data))==E_FAIL )
 	{
-		mem_ptr_->PopFIFO_MT(&prof_cnt_, sizeof(prof_cnt_));
+		mem_ptr->PopFIFO_MT(&prof_data, sizeof(prof_data));
 	}
 
-	prof_cnt_.Reset();
+	ResetProfData();
 }
 void Start()
 {
 	ASSERT(start_val_== 0);
 	//__sync_synchronize();
 	struct timespec t1, t0;
-	prof_cnt_.last_cnt_ =1; //Informs that the Start function was called
+	prof_data.last_cnt_ =1; //Informs that the Start function was called
 
 	if(evalType_ == TIME_EVAL)
 	{
@@ -429,17 +410,17 @@ void Stop(uint64_t *prof_valp = NULL)
 		int64_t tmp_val = t64 - start_val_ + acc_cnt_ - delta_;// check if calling to both, the tested code and gettime function, took less time than delta_ time (it can happen in case of caching issues)
 		if(tmp_val < 0)
 		{
-			prof_cnt_.last_cnt_ = 20; //add artificial small number of nsecs (20nsec is about 30 cycles for 1.6 Ghz CPU clock)
+			prof_data.last_cnt_ = 20; //add artificial small number of nsecs (20nsec is about 30 cycles for 1.6 Ghz CPU clock)
 		}
 		else
 		{
-			prof_cnt_.last_cnt_= tmp_val;
+			prof_data.last_cnt_= tmp_val;
 		}
 	}
 	else
 	{
 		//Calculate profiling of any values
-		prof_cnt_.last_cnt_= *prof_valp;
+		prof_data.last_cnt_= *prof_valp;
 	}
 	//prof_cnt_.last_cnt_=  t64 - start_val_ + acc_cnt_ - delta_;
 	//prof_cnt_.last_cnt_=  t64 - start_val_ + acc_cnt_; // force delta_ = 0 since there is sometime values of the counter less than delta and then we get negative measurement
@@ -447,22 +428,16 @@ void Stop(uint64_t *prof_valp = NULL)
 	//ASSERT((t64 - start_val_) < 100000000000L)
 	//ASSERT(acc_cnt_ == 0)
 	//ASSERT(prof_cnt_.last_cnt_ < 100000000000L)
-#ifdef yafit
-	if(prof_cnt_.last_cnt_ > 100000000000L)
-	{
-		printf("t64=%llu, start_val_=%llu, acc_cnt_=%llu, delta_=%llu\n", t64, start_val_, acc_cnt_, delta_);
-	}
-#endif
 	acc_cnt_ = 0;
-	if(prof_cnt_.last_cnt_ > prof_cnt_.max_cnt_)
+	if(prof_data.last_cnt_ > prof_data.max_cnt_)
 	{
-		prof_cnt_.max_cnt_ = prof_cnt_.last_cnt_;
-		prof_cnt_.max_cnt_time_ = start_val_;
+		prof_data.max_cnt_ = prof_data.last_cnt_;
+		prof_data.max_cnt_time_ = start_val_;
 	}
-	prof_cnt_.average_cnt_ += prof_cnt_.last_cnt_;
+	prof_data.average_cnt_ += prof_data.last_cnt_;
 	start_val_ = 0;
-	prof_cnt_.meas_num_++;
-	if((max_calls_ !=0) &&(  max_calls_ <= prof_cnt_.meas_num_))
+	prof_data.meas_num_++;
+	if((max_calls_ !=0) &&(  max_calls_ <= prof_data.meas_num_))
 	{
 		Update();
 	}
@@ -472,7 +447,7 @@ void Stop(uint64_t *prof_valp = NULL)
 
 void Reset()
 {
-	prof_cnt_.Reset();
+	ResetProfData();
 	start_val_ = 0;
 	acc_cnt_ = 0;
 }
@@ -488,7 +463,6 @@ class CProfilerGroup
 {
 	StaticMemArea<ProfilerCntD,PROF_FIFO_SIZE> 	  prof_fifo_[PROF_GROUP_MAX];
 	uint32_t	  num_alloc_prof_;
-	CProfileCnt  prof_cntrs_[PROF_FIFO_SIZE];
 	char group_name_[TRACE_STRING_SIZE];
 public:
 	void Reset(bool attach= false)
@@ -504,19 +478,16 @@ public:
 	{
 		Reset(false);
 	}
+
+	CMemArea *GetProfEntryFifo(uint32_t prof_id)
+	{
+		return &prof_fifo_[prof_id];
+	}
 	void SetGroupName(char* group_name)
 	{
 		strcpy(group_name_, group_name);
 	}
 
-	CProfileCnt* GetProfCounter(uint32_t prof_id)
-	{
-		if(prof_id>=num_alloc_prof_)
-		{
-			return NULL;
-		}
-		return &prof_cntrs_[prof_id];
-	}
 	uint32_t RegistryProfileEntry(char* prof_name)
 	{
 		uint32_t i;
@@ -530,10 +501,14 @@ public:
 		}
 		num_alloc_prof_++;
 		prof_fifo_[i].Setup(PROF_FIFO_SIZE, sizeof(ProfilerCntD), prof_name);
-		prof_cntrs_[i].Init(prof_name, static_cast<CMemArea*>(&prof_fifo_[i]));
 		return i;
 	}
 
+	uint32_t AddProfileEntry(int prof_entry_num, ProfilePoint *prof_entry)
+	{
+		CProfileCnt *prof_ptr= static_cast<CProfileCnt*>(prof_entry);
+		prof_ptr->Init(static_cast<CMemArea*>(&prof_fifo_[prof_entry_num]));
+	}
 	uint32_t GetGrpProfNum()
 	{
 		return num_alloc_prof_;

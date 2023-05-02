@@ -14,7 +14,7 @@
 #include "i_sys_types.h"
 //#include "common_typedef.h"
 #include "i_sys_utils.h"
-#define alignas(X) __attribute__((aligned(X)))
+//#define alignas(X) __attribute__((aligned(X)))
 #ifdef __cplusplus
 extern "C" {
 #else
@@ -68,10 +68,12 @@ bool RTDBG_GetLog(char *log_strm, struct timespec *linux_time, uint64_t grp_mask
 uint32_t  	RTDBG_AddProfiler(HANDLER debug_grp, char *prof_name);
 
 //Collection profiler messages .
-void		RTDBG_StartProfMeas(HANDLER debug_grp, uint32_t prof_id);
-void		RTDBG_StopProfMeas(HANDLER debug_grp, uint32_t prof_id);
-void		RTDBG_StopStartProfMeas(HANDLER debug_grp, uint32_t prof_id);
-void		RTDBG_PutProfVal(HANDLER debug_grp, uint32_t prof_id, uint64_t *val);
+void		RTDBG_StartProfMeas(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point);
+void	    RTDBG_ProfFlushMeas(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point);
+void	    RTDBG_ProfInit(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point, int meas_cnt);
+void		RTDBG_StopProfMeas(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point);
+void		RTDBG_StopStartProfMeas(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point);
+void		RTDBG_PutProfVal(HANDLER debug_grp, uint32_t prof_id, uint64_t *val, ProfilePoint *prof_point);
 
 //Extract number allocated profilers per group.
 uint32_t	RTDBG_AllocProfCntr(HANDLER debug_grp);

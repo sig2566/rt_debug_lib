@@ -52,13 +52,17 @@ void RT_debug_save_log(enum E_GROUPS id, int line, char* log_str);
 //Get event counter
 volatile uint64_t* RT_debug_get_event_cnt(int group_name);
 
+//Init profiling measurement point
+void RT_debug_prof_init(int group_prof, ProfilePoint* prof, int update_count);
 //Start profiling measurement
-void RT_debug_prof_start(int group_prof);
+void RT_debug_prof_start(int group_prof, ProfilePoint* prof);
 //Stop profiling measurement
-void RT_debug_prof_stop(int group_prof);
+void RT_debug_prof_stop(int group_prof, ProfilePoint* prof);
+//Flush the profiling data when the profiling measurement is stopped
+void RT_debug_prof_flush(int group_prof, ProfilePoint* prof);
 
 //Extract profiler data
-bool RT_debug_get_prof_data(enum EGroupProfile id, ProfileData *prof_ptr);
+bool RT_debug_get_prof_data(int id, ProfileData *prof_ptr);
 //Start RT debugging
 void RT_debug_start();
 //Stop RT debugging
@@ -79,11 +83,16 @@ bool RT_debug_get_grp_log(int group_id, char *log_str);
 //Save log
 #define RTDBG_SAVE_LOG(grp_name, l) RT_debug_save_log(grp_name, __LINE__, l);
 
+//Define profiler point
+#define RTDBG_INIT_PROF(grp_name, prof_name, prof, meas_cnt) RT_debug_prof_init(grp_name##_##prof_name, prof, meas_cnt);
 //Start profiling
-#define RTDBG_START_PROF(grp_name, prof_name) RT_debug_prof_start(grp_name##_##prof_name);
+#define RTDBG_START_PROF(grp_name, prof_name, prof) RT_debug_prof_start(grp_name##_##prof_name, prof);
 
 //Stop profiling
-#define RTDBG_STOP_PROF(grp_name, prof_name) RT_debug_prof_stop(grp_name##_##prof_name);
+#define RTDBG_STOP_PROF(grp_name, prof_name, prof) RT_debug_prof_stop(grp_name##_##prof_name, prof);
+
+//Flush profiler data
+#define RTDBG_FLUSH_DATA_PROF(grp_name, prof_name, prof) RT_debug_prof_flush(grp_name##_##prof_name, prof);
 
 //Get event counter
 #define RTDBG_GET_EVENT_CNTR_PTR(grp_name, event_name)  \
