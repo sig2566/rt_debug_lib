@@ -174,6 +174,7 @@ void RT_debug_stop()
 bool	RT_debug_ExtractDebugData(char *out_file)
 {
 	RTDBG_Stop();
+	printf("Extract data to %s file\n", out_file);
 	return RTDBG_ExtractDebugData(out_file);
 }
 

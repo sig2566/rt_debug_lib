@@ -218,17 +218,6 @@ public:
 	*@brief The purpose of this class is :
 	*@brief This class implements the profiler counter.
 	*********************************************************************************************/
-//Profiler counter data
-struct ProfilerCntD : public ProfileData
-{
-
-	void Reset()
-	{
-		max_cnt_ = last_cnt_ = average_cnt_ = max_cnt_time_ = 0;
-		meas_num_ = 0;
-	}
-};
-
 
 
 alignas(CACHE_ALIGNMENT) class  CProfileCnt : public ProfilePoint
@@ -291,7 +280,6 @@ void Init(CMemArea *mem_ptr, uint32_t max_count= 500)
 }
 void Update()
 {
-	ProfilerCntD tmp;
 	if(prof_data.meas_num_ == 0)
 		return;
 	prof_data.average_cnt_ = prof_data.average_cnt_/prof_data.meas_num_;
@@ -461,7 +449,7 @@ void Reset()
 ***********************************************************************************************///
 class CProfilerGroup
 {
-	StaticMemArea<ProfilerCntD,PROF_FIFO_SIZE> 	  prof_fifo_[PROF_GROUP_MAX];
+	StaticMemArea<ProfileData,PROF_FIFO_SIZE> 	  prof_fifo_[PROF_GROUP_MAX];
 	uint32_t	  num_alloc_prof_;
 	char group_name_[TRACE_STRING_SIZE];
 public:
@@ -500,7 +488,8 @@ public:
 			}
 		}
 		num_alloc_prof_++;
-		prof_fifo_[i].Setup(PROF_FIFO_SIZE, sizeof(ProfilerCntD), prof_name);
+		prof_fifo_[i].Setup(PROF_FIFO_SIZE, sizeof(ProfileData), prof_name);
+		prof_fifo_[i].MemAlloc();
 		return i;
 	}
 
@@ -518,11 +507,11 @@ public:
 		bool res = false;
 		ASSERT(i<num_alloc_prof_);
 		uint32_t measure_cnt=0;
-		ProfilerCntD tmp_cnt, cnt_val;
+		ProfileData tmp_cnt, cnt_val = {0};
 		char buf[200];
-		cnt_val.Reset();
 
-		while(prof_fifo_[i].PopFIFO_MT((void*)&tmp_cnt, sizeof(ProfilerCntD))!= NULL)
+
+		while(prof_fifo_[i].PopFIFO_MT((void*)&tmp_cnt, sizeof(ProfileData))!= NULL)
 		{
 			if(tmp_cnt.meas_num_ == 0)
 			{
