@@ -205,7 +205,7 @@ public:
 
 		SysTimeT curr_sys_time(tmp_entry.sys_time);
 		t64= (uint64_t)tmp_entry.linux_time.tv_sec * BILLION + (uint64_t)tmp_entry.linux_time.tv_nsec;
-		n=  sprintf(log_entry, "%ulld, %ud, %ud, %d, %s,  %s", t64, curr_sys_time.nf, curr_sys_time.nsf, curr_sys_time.offset,
+		n=  sprintf(log_entry, "%lld, %u, %u, %d, %s,  %s", t64, curr_sys_time.nf, curr_sys_time.nsf, curr_sys_time.offset,
 				group_name_, tmp_entry.log_str);
 		*linux_time= tmp_entry.linux_time;
 		*sys_time = tmp_entry.sys_time;

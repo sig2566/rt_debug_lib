@@ -117,7 +117,7 @@ int RT_debug_save_trace(enum EGroupTrace id, int line, uint64_t val0, uint64_t v
 //Save log data
 void RT_debug_save_log(enum E_GROUPS id, int line, char* log_str)
 {
-	return RTDBG_AddLog(group_names[id], NULL, log_str);
+	return RTDBG_AddLog(id, NULL, log_str);
 }
 
 volatile uint64_t* RT_debug_get_event_cnt(int group_name)

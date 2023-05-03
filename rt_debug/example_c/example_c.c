@@ -40,9 +40,11 @@ void WorkThread(void* param)
 	int i;
 	int *delay= (int*)param;
 	ProfilePoint prof_task;
+	uint64_t *watch_dog= RTDBG_GET_EVENT_CNTR_PTR(STATUS_GROUP,EV_WATCHDOG);
 	RTDBG_INIT_PROF(GEN_GROUP, UI_PROF, &prof_task, 500);
 	for(i=0; i < num_iter; i++)
 	{
+		*watch_dog+=1;
 		RTDBG_START_PROF(GEN_GROUP, UI_PROF, &prof_task);
 		RTDBG_SAVE_TRACE(GEN_GROUP, PASSED, i, 0, 0, 0);
 		usleep(*delay);
@@ -61,6 +63,8 @@ void Run_application()
 	const int delay_avg= 1000;
 	int i;
 	pthread_t tid[thread_num];
+	uint64_t *ex_status= RTDBG_GET_EVENT_CNTR_PTR(STATUS_GROUP,EV_STATUS);
+	*ex_status= 0;
 	for(i=0;i<thread_num;i++)
 	{
 		int delay= delay_avg+ rand()%delay_diff_max;
@@ -68,12 +72,13 @@ void Run_application()
 	    pthread_create(&tid[i], NULL, WorkThread, (void*)&delay);
 	    RTDBG_SAVE_TRACE(INIT_GROUP, CREATE_THREAD, i, (uint32_t)tid[i], 0, 0);
 	}
+	*ex_status= 1;
 	for(i=0;i<thread_num;i++)
 	{
 
 	    pthread_join(tid[i], NULL);
 	}
-
+	*ex_status= 2;
 }
 
 void RunMonitor()
@@ -137,14 +142,20 @@ int main(int argc, char *argv[]) {
         }
     }
     argv += optind;
+
     switch(tst_action){
     case E_APPLICATION:
+    	RTDBG_Start();
+    	RTDBG_SAVE_LOG(INIT_GROUP,"Start running application");
     	Run_application();
+    	RTDBG_SAVE_LOG(GEN_GROUP,"Stop application");
     	break;
     case E_MONITOR:
     	RunMonitor();
     case E_EXTRACT:
+    	RTDBG_Stop();
     	ExtractData();
     }
+    RTDBG_SAVE_LOG(STATUS_GROUP,"Exit application");
 	return EXIT_SUCCESS;
 }
