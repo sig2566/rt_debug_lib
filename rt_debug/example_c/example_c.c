@@ -146,11 +146,12 @@ int main(int argc, char *argv[]) {
     switch(tst_action){
     case E_APPLICATION:
     	RTDBG_Start();
-    	RTDBG_SAVE_LOG(INIT_GROUP,"Start running application");
+    	RTDBG_SAVE_LOG(INIT_GROUP,"Start running application %d", 10);
     	Run_application();
     	RTDBG_SAVE_LOG(GEN_GROUP,"Stop application");
     	break;
     case E_MONITOR:
+    	RTDBG_Stop();
     	RunMonitor();
     case E_EXTRACT:
     	RTDBG_Stop();

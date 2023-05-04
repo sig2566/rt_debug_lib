@@ -81,7 +81,12 @@ bool RT_debug_get_grp_log(int group_id, char *log_str);
 		RT_debug_save_trace(grm_name##_##trace_name, __LINE__, v0, v1, v2, v3);
 
 //Save log
-#define RTDBG_SAVE_LOG(grp_name, l) RT_debug_save_log(grp_name, __LINE__, l);
+#define RTDBG_SAVE_LOG(grp_name, ...) {\
+	char buf[100];\
+	sprintf(buf,__VA_ARGS__);\
+	RT_debug_save_log(grp_name, __LINE__, buf);\
+	};
+
 
 //Define profiler point
 #define RTDBG_INIT_PROF(grp_name, prof_name, prof, meas_cnt) RT_debug_prof_init(grp_name##_##prof_name, prof, meas_cnt);
