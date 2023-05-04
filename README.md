@@ -22,10 +22,10 @@ This document describes the open source project, called rt_debug_lib. The rt_deb
 The debugging information, collected during the test is saved in the shared memory. So it survise the application crush and may be restored and checked after it.
 ### Data Hierarchy
 The data hierarchy is following:
-* General debugger class ##CDebugRT##. It contains array of the Debugging groups of type ##CGroupDebugRT##. The array size is set by the ##MAX_GROUP_NUM## variable.
-  * The class ##CGroupDebugRT## is group class. The every debugging group is indipendent object. It may run indipendently by different applications or different modules of the application. It includes objects for the debugging tools.
-    * Logger is implemented with the class ##CLog_group##. The logger is responsible to keep logs in the internal FIFO. The special monitor should extract the logs in run time or it may be extracted when the application failed.
-    * The profiler groups ##CProfilerGroup## class contains ##PROF_GROUP_MAX## profiler points. Every profiler point contains is associated with its FIFO, which keeps result of the profiler point measurement.
+* General debugger class **CDebugRT**. It contains array of the Debugging groups of type ##CGroupDebugRT##. The array size is set by the **MAX_GROUP_NUM** variable.
+  * The class **CGroupDebugRT** is group class. The every debugging group is indipendent object. It may run indipendently by different applications or different modules of the application. It includes objects for the debugging tools.
+    * Logger is implemented with the class **CLog_group**. The logger is responsible to keep logs in the internal FIFO. The special monitor should extract the logs in run time or it may be extracted when the application failed.
+    * The profiler groups **CProfilerGroup** class contains **PROF_GROUP_MAX** profiler points. Every profiler point contains is associated with its FIFO, which keeps result of the profiler point measurement.
       * The profiler measurement is defined in the structure **ProfileData**. The following data are measured:
         * uint64_t max_cnt_;        -Maximal value during the measurement perios
 	      * uint64_t max_cnt_time_;   -Time when the maximal measurement happen.
@@ -33,4 +33,4 @@ The data hierarchy is following:
 	      * uint64_t average_cnt_;    -Average value during te measurement period.
 	      * uint64_t meas_num_;       -Number measurements
       * Traces group ##CTraceGroup## keepstrace buffer of size **TRACE_ENTRIES_NUM**. Also it contains **MAX_TRACE_FORMATS** trace formats.
-      * The event counter group class ##CRT_counter_grp## contains ##NUM_COUNTERS## event counter objects of type ##RT_counter##.
+      * The event counter group class ##CRT_counter_grp## contains **NUM_COUNTERS** event counter objects of type **RT_counter**.
