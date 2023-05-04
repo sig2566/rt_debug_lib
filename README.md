@@ -34,3 +34,7 @@ The data hierarchy is following:
 	      * uint64_t meas_num_;       -Number measurements
       * Traces group ##CTraceGroup## keepstrace buffer of size **TRACE_ENTRIES_NUM**. Also it contains **MAX_TRACE_FORMATS** trace formats.
       * The event counter group class ##CRT_counter_grp## contains **NUM_COUNTERS** event counter objects of type **RT_counter**.
+
+## Integration with user's code.
+
+# TDDO
