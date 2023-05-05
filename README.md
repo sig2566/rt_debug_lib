@@ -50,6 +50,29 @@ The project t_debug/example_c contain an example of integration of the C project
   *  Read the context of the /tmp/rt_debug.txt file  
 
 ## General integration steps:
-### Definition of 
+### Definition of RT library features configuration
+The features should be configured using special MACROs. All definitions are put into the specific files in the **rt_debug_lib/rt_debug/cust_api** directory. The following files are used for configuration:
+* groups.inc -- this file is used for definition of the debugging groups. The MACRO **DEF_GROUP** is used. Example groups definition:
+```
+DEF_GROUP(INIT_GROUP)
+DEF_GROUP(GEN_GROUP)
+```
+* profiles.inc -- Definition of profiler points. Example
+```
+DEF_PROFILE(GEN_GROUP, TST_PROF)
+DEF_PROFILE(GEN_GROUP, UI_PROF)
+```
+* events.inc -- Definition of event counters. Example:
+```
+DEF_EVENT(STATUS_GROUP,EV_STATUS)
+DEF_EVENT(STATUS_GROUP,EV_WATCHDOG)
+* traces.inc -- Definition of the tracepoint and its format:
+```
+DEF_TRACE(INIT_GROUP, CREATE_THREAD, "New thread was created num= %x thread_id = 0x%X")
+DEF_TRACE(GEN_GROUP, PASSED, "Passed val= 0x%X")
+```
+
+## Add the RT debug API functions to the user's code.
+
 
 # TDDO
