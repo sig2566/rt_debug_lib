@@ -1,9 +1,7 @@
 /******************************************************************
  * i_osa_api.h
  * Author: Igor Shoihet
- * Copyright (c) 2018 - 2020 Airspan Networks
- * All Rights Reserved.
- * Confidential and Proprietary - Airspan Networks
+ * Copyright   : GNU GENERAL PUBLIC LICENSE
  *******************************************************************/
 #ifndef _FLEXRAN_COMMON_H
 #define _FLEXRAN_COMMON_H

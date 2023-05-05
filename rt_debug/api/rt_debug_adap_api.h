@@ -42,7 +42,7 @@ enum EGroupProfile
 #include "profiles.inc"
 MAX_PROFILER
 };
-//Initialization of RT debug environment
+//Initialization of RT debug environment and prepare collection of the debug information into the file mem_map_file
 int RT_debug_init(char *mem_map_file);
 //Add trace data
 int RT_debug_save_trace(enum EGroupTrace id, int line, uint64_t val0, uint64_t val1, uint64_t val2, uint64_t val3);

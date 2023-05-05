@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
 
     switch(tst_action){
     case E_APPLICATION:
-    	RTDBG_Start();
+    	RT_debug_start();
     	RTDBG_SAVE_LOG(INIT_GROUP,"Start running application %d", 10);
     	Run_application();
     	RTDBG_SAVE_LOG(GEN_GROUP,"Stop application");
@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
     	RTDBG_Stop();
     	RunMonitor();
     case E_EXTRACT:
-    	RTDBG_Stop();
+    	RT_debug_stop();
     	ExtractData();
     }
     RTDBG_SAVE_LOG(STATUS_GROUP,"Exit application");
