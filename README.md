@@ -35,6 +35,34 @@ The data hierarchy is following:
       * Traces group ##CTraceGroup## keepstrace buffer of size **TRACE_ENTRIES_NUM**. Also it contains **MAX_TRACE_FORMATS** trace formats.
       * The event counter group class ##CRT_counter_grp## contains **NUM_COUNTERS** event counter objects of type **RT_counter**.
 
+# RT debugging extracted data format.
+The following information is presented after extraction of the collected RT debugging data:
+* Event counters value:
+```
+vent Counters
+**************
+STATUS_GROUP, EV_STATUS, 2
+STATUS_GROUP, EV_WATCHDOG, 99618
+*************
+```
+* Profiler point information:
+```
+Profilers
+*************
+GEN_GROUP, UI_PROF, avg=, 1085003, max=, 3964256, last=, 1084288, max time=, 108520185534605, measurements=, 9000
+**************
+```
+* Trace information:
+```
+108520172652619, 0, 0, 0, INIT_GROUP, 55104, 73, New thread was created num= 9 thread_id = 0x21F56700
+108528876943931, 0, 0, 0, GEN_GROUP, 34560, 49, Passed val= 0x1F35
+
+Logs:
+```
+108520172410519, 0, 0, 0, INIT_GROUP,  Start running application 10
+108531080142880, 0, 0, 0, GEN_GROUP,  Stop application
+```
+```
 # Integration with user's code.
 ## Use case example
 The project t_debug/example_c contain an example of integration of the C project with the RT debug library. This project include examples of usaage of all tools from the RT debugging tool library. This example was tested in Linux whith gcc4.5.8 installed. The more advanced GCC versions also should work.
@@ -79,8 +107,25 @@ There are API functions and MACROs in the **rt_debug_lib/rt_debug/api/rt_debug_a
 * RT_debug_start  -- Start collection RT debug information
 * RT_debug_stop  -- stop the collection debugging information
 * RTDBG_SAVE_LOG(group name, printf like fromatted line)   - MACRO to collect the logging per group.
-*  RTDBG_SAVE_TRACE(INIT_GROUP, CREATE_THREAD, i, (uint32_t)tid[i], 0, 0); --MACRO to save the trace information.
-*  RTDBG_GET_EVENT_CNTR_PTR  -- get pointer to some event counter. Example: uint64_t *ex_status= RTDBG_GET_EVENT_CNTR_PTR(STATUS_GROUP,EV_STATUS);
-*  
+* RTDBG_SAVE_TRACE(INIT_GROUP, CREATE_THREAD, i, (uint32_t)tid[i], 0, 0); --MACRO to save the trace information.
+* RTDBG_GET_EVENT_CNTR_PTR  -- get pointer to some event counter. Example: uint64_t *ex_status= RTDBG_GET_EVENT_CNTR_PTR(STATUS_GROUP,EV_STATUS);
+* Support the profiler points. Since it is possible, that the same profiled code runs in parallel by different threads, the profiling should use the locally allocated data to be independed from the multithreading. See example in the **rt_lib_example** code. There are support from in the case of multi-threading:
+   * ProfilePoint prof_task;  -- definition of the profiled in the local memory
+   * RTDBG_INIT_PROF(GEN_GROUP, UI_PROF, &prof_task, 500); -- Initialization current instance of the profiler point. Note, the last parameter is update counter. It define how many time to measure the profiler point before the result is saved in FIFO. 
+   * RTDBG_START_PROF -- start pprofiler point measurement
+   * RTDBG_STOP_PROF -- Stop profiler measurement.
+   * RTDBG_FLUSH_DATA_PROF -- Stop with flush all collected information into the FIFO.
+* RT_debug_ExtractDebugData(output file name) -- extract profiler data in the text format into the file
 
-# TDDO
+## Modification of the application build script
+The following changes should be added to the application build script to support interation with RT debug library:
+* Add RT debugger API pathes to the compiler command line:  **H_INC_DIR:= -I../api/ -I../rt_debug_cpp/api -I../../rt_debug/cust_api**
+* Add linker command to link with RT debugger libraries: **LIB= -L ../rt_debug_c/bin -l  rtdebugadap -L ../rt_debug_cpp/bin -l rtdebug  -lpthread**
+* Ass support for multithreading with the following compailer flag: **-pthread**
+
+# TODO
+The following issues should be added in future to the rt debugger library:
+* Add support to the monitoring of execution of he application.
+* Improve gettime speed. It is possible to use the core clock couner
+* Use huge pages for RT shared memory to avoid performane degradation due to the page swapping.
+* Need to add interface function, supporting getting logs and profiler measurement in run time
