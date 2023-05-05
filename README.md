@@ -35,6 +35,21 @@ The data hierarchy is following:
       * Traces group ##CTraceGroup## keepstrace buffer of size **TRACE_ENTRIES_NUM**. Also it contains **MAX_TRACE_FORMATS** trace formats.
       * The event counter group class ##CRT_counter_grp## contains **NUM_COUNTERS** event counter objects of type **RT_counter**.
 
-## Integration with user's code.
+# Integration with user's code.
+## Use case example
+The project t_debug/example_c contain an example of integration of the C project with the RT debug library. This project include examples of usaage of all tools from the RT debugging tool library. This example was tested in Linux whith gcc4.5.8 installed. The more advanced GCC versions also should work.
+### Use case compile and run
+* Compilation
+  * cd rt_debug_lib/rt_debug
+  * ./build.sh
+* Running
+  * cd example_c/bin
+  * rm /tmp/rt_debug.dat  -- Remove the file, containing collected debugging data from the previos run.
+  *  ./rt_lib_example -a  -- Running application example, which use RT debuggings tool and save the debugging information in the /tmp/rt_debug.dat file
+  *  ./rt_lib_example -e  -- Extraction of the debugging information and save it in the /tmp/rt_debug.txt file
+  *  Read the context of the /tmp/rt_debug.txt file  
+
+## General integration steps:
+### Definition of 
 
 # TDDO
