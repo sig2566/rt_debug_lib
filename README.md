@@ -66,6 +66,7 @@ DEF_PROFILE(GEN_GROUP, UI_PROF)
 ```
 DEF_EVENT(STATUS_GROUP,EV_STATUS)
 DEF_EVENT(STATUS_GROUP,EV_WATCHDOG)
+```
 * traces.inc -- Definition of the tracepoint and its format:
 ```
 DEF_TRACE(INIT_GROUP, CREATE_THREAD, "New thread was created num= %x thread_id = 0x%X")
@@ -73,6 +74,13 @@ DEF_TRACE(GEN_GROUP, PASSED, "Passed val= 0x%X")
 ```
 
 ## Add the RT debug API functions to the user's code.
-
+There are API functions and MACROs in the **rt_debug_lib/rt_debug/api/rt_debug_adap_api.h** file.There are the main API functions below
+* RT_debug_init(rt_debug_data);  -- Activation the collection of the RT debg data into the rt_debug_data file.
+* RT_debug_start  -- Start collection RT debug information
+* RT_debug_stop  -- stop the collection debugging information
+* RTDBG_SAVE_LOG(group name, printf like fromatted line)   - MACRO to collect the logging per group.
+*  RTDBG_SAVE_TRACE(INIT_GROUP, CREATE_THREAD, i, (uint32_t)tid[i], 0, 0); --MACRO to save the trace information.
+*  RTDBG_GET_EVENT_CNTR_PTR  -- get pointer to some event counter. Example: uint64_t *ex_status= RTDBG_GET_EVENT_CNTR_PTR(STATUS_GROUP,EV_STATUS);
+*  
 
 # TDDO
