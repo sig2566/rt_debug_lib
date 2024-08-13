@@ -14,16 +14,26 @@
 #include <iostream>
 #include <sstream>
 #include <errno.h>
-#include "i_sys_types.h"
+
+#include "rt_debug_defs.h"
 #include "rt_debug_api.h"
 #include "i_cpp_sys_api.h"
-#include "i_cpp_module.h"
 //Data definition section
 // All strings should be align to 64 bytes
 
 
 namespace RT_DEBUG
 {
+static __syscall_slong_t DiffBetweenTimespec  (timespec t1,timespec t2)
+{
+	timespec new_t;
+	uint64_t t64_1,t64_2;
+	__syscall_slong_t t64_3;
+	t64_1= (uint64_t)t1.tv_sec * BILLION + (uint64_t)t1.tv_nsec;
+	t64_2= (uint64_t)t2.tv_sec * BILLION + (uint64_t)t2.tv_nsec;
+	t64_3=t64_1-t64_2;
+	return t64_3;
+}
 class CDebugRT;
 /*******************************************************************************************//*!
 *@class CRT_counter_grp class
@@ -108,13 +118,15 @@ public:
 struct Trace_entry
 {
 	timespec 		linux_time;
-	GenSysTime	 	sys_time;
 	uint16_t 		trace_id;
 	uint16_t		thread_id;
 	uint32_t 		line_num;
+	uint32_t		status;
+	uint32_t		future_use;
 	uint64_t 		vals[4];
 	};
 const uint16_t NO_DATA_IND= -1;
+const uint16_t DATA_IND= 0;
 /*******************************************************************************************//*!
 *@class CTraceGroup class
 *@brief The purpose of this class is :
@@ -134,16 +146,15 @@ public:
 	void SetGroupName(char* group_name);
 
 	int32_t AddTraceFormat(char *format_str);
-	void AddTrace(uint32_t trace_id, uint32_t line_num, GenSysTime *sys_time, uint64_t var0 = 0, uint64_t var1 = 0, uint64_t var2 = 0, uint64_t var3 = 0);
+	void AddTrace(uint32_t trace_id, uint32_t line_num, uint64_t var0 = 0, uint64_t var1 = 0, uint64_t var2 = 0, uint64_t var3 = 0);
 
-	bool GetTraceEntry(char *trace_entry_str, timespec *linux_time, GenSysTime *sys_time);
+	bool GetTraceEntry(char *trace_entry_str, timespec *linux_time);
 
 };
 const uint32_t LOG_STRING_SIZE= TRACE_STRING_SIZE - sizeof(timespec) - sizeof(GenSysTime);
 struct LogEntry
 {
 	timespec 		linux_time;
-	GenSysTime	 	sys_time;
 	char log_str[LOG_STRING_SIZE]; //Log string length < 96
 };
 
@@ -170,21 +181,11 @@ public:
 	{
 	}
 
-	void AddLog(GenSysTime *sys_time, char *log_str)
+	void AddLog(char *log_str)
 	{
 		LogEntry tmp_entry, dummy_entry;;
 		clock_gettime(CLOCK_MONOTONIC, &tmp_entry.linux_time);
-		if(sys_time !=0)
-		{
-			GenSysTime *tmp_sys_time= sys_time;
-			tmp_entry.sys_time= *tmp_sys_time;
-		}
-		else
-		{
-			tmp_entry.sys_time.nf = 0;
-			tmp_entry.sys_time.nsf = 0;
-			tmp_entry.sys_time.offset = 0;
-		}
+
 		strncpy(tmp_entry.log_str, log_str, LOG_STRING_SIZE);
 		while(logs_fifo_.PushFIFO_MT(&tmp_entry, sizeof(LogEntry))==E_FAIL)
 		{
@@ -192,7 +193,7 @@ public:
 		}
 	}
 
-	bool GetLogEntry(char *log_entry, timespec *linux_time, GenSysTime *sys_time)
+	bool GetLogEntry(char *log_entry, timespec *linux_time)
 	{
 
 		uint32_t n, n1;
@@ -203,12 +204,9 @@ public:
 			return false;
 		}
 
-		SysTimeT curr_sys_time(tmp_entry.sys_time);
 		t64= (uint64_t)tmp_entry.linux_time.tv_sec * BILLION + (uint64_t)tmp_entry.linux_time.tv_nsec;
-		n=  sprintf(log_entry, "%lld, %u, %u, %d, %s,  %s", t64, curr_sys_time.nf, curr_sys_time.nsf, curr_sys_time.offset,
-				group_name_, tmp_entry.log_str);
+		n=  sprintf(log_entry, "%lu, %s,  %s", t64, group_name_, tmp_entry.log_str);
 		*linux_time= tmp_entry.linux_time;
-		*sys_time = tmp_entry.sys_time;
 		return true;
 	}
 };
@@ -220,7 +218,7 @@ public:
 	*********************************************************************************************/
 
 
-alignas(CACHE_ALIGNMENT) class  CProfileCnt : public ProfilePoint
+class  alignas(CACHE_ALIGNMENT) CProfileCnt : public ProfilePoint
 {
 
 public:
@@ -497,6 +495,7 @@ public:
 	{
 		CProfileCnt *prof_ptr= static_cast<CProfileCnt*>(prof_entry);
 		prof_ptr->Init(static_cast<CMemArea*>(&prof_fifo_[prof_entry_num]));
+		return 0;
 	}
 	uint32_t GetGrpProfNum()
 	{

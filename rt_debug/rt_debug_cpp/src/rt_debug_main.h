@@ -17,7 +17,7 @@ struct TraceInfo
 {
 	char trace_str[TRACE_STRING_SIZE*2];
 	timespec	lin_time;
-	GenSysTime  sys_time;
+	uint32_t status;
 } ;
 
 struct LogSort_Data
@@ -50,8 +50,6 @@ class CDebugHandler
 		uint32_t i;
 		for(i=0; i< MAX_GROUP_NUM; i++)
 		{
-			grp_trace_res_[i].sys_time.nf= NO_DATA_IND;
-			grp_trace_res_[i].sys_time.nsf = 0;
 			grp_logs_last[i].valid = false;
 
 		}
@@ -94,7 +92,7 @@ public:
 		return grp_cnt->Get_cnt_num();
 	}
 	//TRACE entry API
-	void 		RTDBG_AddTrace(HANDLER debug_grp, uint32_t trace_id, uint32_t line_num, GenSysTime *sys_time, uint64_t var0 = 0, uint64_t var1 = 0, uint64_t var2 = 0, uint64_t var3 = 0)
+	void 		RTDBG_AddTrace(HANDLER debug_grp, uint32_t trace_id, uint32_t line_num, uint64_t var0 = 0, uint64_t var1 = 0, uint64_t var2 = 0, uint64_t var3 = 0)
 	{
 		if(!mem_attached_)
 			return;
@@ -102,7 +100,7 @@ public:
 			return;
 		CGroupDebugRT* grp_p= rt_debugp_->GetDebugGrp(debug_grp);
 		CTraceGroup* tracer_p= grp_p->GetTracer();
-		tracer_p->AddTrace(trace_id, line_num, sys_time, var0, var1, var2, var3);
+		tracer_p->AddTrace(trace_id, line_num, var0, var1, var2, var3);
 	}
 	bool        RTDBG_GetTraceEntry(char *trace_entry_str, timespec *linux_time);
 	uint32_t    RTDBG_AddTraceEntry(HANDLER grp, char* format)
@@ -200,7 +198,7 @@ public:
 			for(j=0; j< num_ev_cnt; j++)
 			{
 				RT_counter* cnt_p =grp_cntrs_p->Get_counter(j);
-				fprintf(fptr,"%s, %s, %lld\n", grp_name, cnt_p->cnt_name, cnt_p->val);
+				fprintf(fptr,"%s, %s, %ld\n", grp_name, cnt_p->cnt_name, cnt_p->val);
 			}
 		}
 
@@ -221,7 +219,7 @@ public:
 				char prof_name[1000];
 				if(grp_profp->GetProfInfo(j, &prof_tmp, prof_name))
 				{
-					fprintf(fptr, "%s, %s, avg=, %lld, max=, %lld, last=, %lld, max time=, %lld, measurements=, %lld\n",
+					fprintf(fptr, "%s, %s, avg=, %ld, max=, %ld, last=, %ld, max time=, %ld, measurements=, %ld\n",
 							grp_name, prof_name, prof_tmp.average_cnt_, prof_tmp.max_cnt_, prof_tmp.last_cnt_, prof_tmp.max_cnt_time_, prof_tmp.meas_num_);
 				}
 			}
@@ -269,7 +267,7 @@ public:
 		return status_;
 	}
 	//Log Support
-	void RTDBG_AddLog(HANDLER debug_grp, GenSysTime *sys_time, char *log_str)
+	void RTDBG_AddLog(HANDLER debug_grp, char *log_str)
 	{
 		if(!mem_attached_)
 			return;
@@ -277,7 +275,7 @@ public:
 			return;
 		CGroupDebugRT* grp_p= rt_debugp_->GetDebugGrp(debug_grp);
 		CLog_group* log_grp= grp_p->GetLogger();
-		log_grp->AddLog(sys_time, log_str);
+		log_grp->AddLog(log_str);
 	}
 	bool RTDBG_GetLog(char *log_str, timespec *linux_time, uint64_t mask_logs = -1)
 	{
@@ -297,7 +295,7 @@ public:
 				CGroupDebugRT* grp_p= rt_debugp_->GetDebugGrp(i);
 				CLog_group* log_grp= grp_p->GetLogger();
 				grp_logs_last[i].valid =log_grp->GetLogEntry(grp_logs_last[i].log_info.log_str,
-						&grp_logs_last[i].log_info.linux_time, &grp_logs_last[i].log_info.sys_time);
+						&grp_logs_last[i].log_info.linux_time);
 				if(grp_logs_last[i].valid)
 				{
 					//Check time of new log entry
@@ -377,7 +375,7 @@ public:
 		prof_ptr->StopContinue();
 	}
 
-	uint32_t	RTDBG_AllocProfCntr(HANDLER debug_grp)
+	uint32_t	RTDBG_AllocProfCntrNum(HANDLER debug_grp)
 	{
 		if(!mem_attached_)
 			return -1;

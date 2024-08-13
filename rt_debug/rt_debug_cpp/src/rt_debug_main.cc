@@ -20,6 +20,7 @@
 #include <iostream>
 #include <sstream>
 #include <errno.h>
+#include "rt_debug_defs.h"
 #include "rt_debug_api.h"
 #include "rt_debug_main.h"
 
@@ -146,17 +147,17 @@ bool        CDebugHandler::RTDBG_GetTraceEntry(char *trace_entry_str, struct tim
 		CGroupDebugRT* grp_p= rt_debugp_->GetDebugGrp(i);
 		tracers[i] = grp_p->GetTracer();
 
-		if(grp_trace_res_[i].sys_time.nsf == NO_DATA_IND)
+		if(grp_trace_res_[i].status == NO_DATA_IND)
 		{
 			continue;
 		}
 		TraceInfo *trc_datap = &grp_trace_res_[i];
 
-		if(grp_trace_res_[i].sys_time.nf == NO_DATA_IND)
+		if(grp_trace_res_[i].status == NO_DATA_IND)
 		{
-			if(tracers[i]->GetTraceEntry(trc_datap->trace_str, &trc_datap->lin_time, &trc_datap->sys_time)==false)
+			if(tracers[i]->GetTraceEntry(trc_datap->trace_str, &trc_datap->lin_time)==false)
 			{
-				grp_trace_res_[i].sys_time.nsf = NO_DATA_IND; //NO new trace data for group i
+				grp_trace_res_[i].status = NO_DATA_IND; //NO new trace data for group i
 				continue;
 			}
 
@@ -178,7 +179,7 @@ bool        CDebugHandler::RTDBG_GetTraceEntry(char *trace_entry_str, struct tim
 	{
 		strcpy(trace_entry_str, grp_trace_res_[min_index].trace_str);
 		*linux_time = grp_trace_res_[min_index].lin_time;
-		grp_trace_res_[min_index].sys_time.nf= NO_DATA_IND;
+		grp_trace_res_[min_index].status= NO_DATA_IND;
 		return true;
 	}
 
@@ -201,10 +202,10 @@ EXTERN_C uint32_t    RTDBG_GetCountersNum(HANDLER debug_grp)
 	return debug_handler.RTDBG_GetCountersNum(debug_grp);
 }
 //TRACE entry API
-EXTERN_C void 		RTDBG_AddTrace(HANDLER debug_grp, uint32_t trace_id, uint32_t line_num, GenSysTime *sys_time,
+EXTERN_C void 		RTDBG_AddTrace(HANDLER debug_grp, uint32_t trace_id, uint32_t line_num,
 		uint64_t var0, uint64_t var1, uint64_t var2, uint64_t var3)
 {
-	debug_handler.RTDBG_AddTrace(debug_grp, trace_id, line_num, sys_time, var0, var1, var2, var3);
+	debug_handler.RTDBG_AddTrace(debug_grp, trace_id, line_num, var0, var1, var2, var3);
 }
 EXTERN_C bool        RTDBG_GetTraceEntry(char *trace_entry_str, timespec *linux_time)
 {
@@ -216,9 +217,9 @@ EXTERN_C uint32_t    RTDBG_AddTraceEntry(HANDLER grp, char* format)
 }
 
 //Log Support
-EXTERN_C void RTDBG_AddLog(HANDLER debug_grp, GenSysTime *sys_time, char *log_str)
+EXTERN_C void RTDBG_AddLog(HANDLER debug_grp, char *log_str)
 {
-	return debug_handler.RTDBG_AddLog(debug_grp, sys_time, log_str);
+	return debug_handler.RTDBG_AddLog(debug_grp, log_str);
 }
 EXTERN_C  bool RTDBG_GetLog(char *log_str, struct timespec *linux_time, uint64_t grp_mask)
 {

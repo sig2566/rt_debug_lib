@@ -3,8 +3,8 @@
  * Author: Igor Shoihet
  * Copyright   : GNU GENERAL PUBLIC LICENSE
  *******************************************************************/
-#ifndef _FLEXRAN_COMMON_H
-#define _FLEXRAN_COMMON_H
+#ifndef I_OS_COMMON_H
+#define I_OS_COMMON_H
 
 #define POSIX_API
 /*
@@ -12,7 +12,6 @@
  * Include section
  * -----------------------------------------------------------
  */
-//#include "i_sys_types.h"
 //#include "i_sys_utils.h"
 /*
  * --------------------------------------------------------------------------------
@@ -77,7 +76,7 @@ typedef struct
 
 } OSA_SCHED_INFO;
 
-#endif /*_FLEXRAN_COMMON_H*/
+#endif /*I_OS_COMMON_H*/
 
 /*
  * -----------------------------------------------------------

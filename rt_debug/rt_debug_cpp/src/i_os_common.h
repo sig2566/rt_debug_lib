@@ -5,8 +5,8 @@
  * All Rights Reserved.
  * Confidential and Proprietary - Airspan Networks
  *******************************************************************/
-#ifndef _FLEXRAN_COMMON_H
-#define _FLEXRAN_COMMON_H
+#ifndef _I_OS_COMMON_H
+#define _I_OS_COMMON_H
 
 #define POSIX_API
 /*
@@ -79,7 +79,7 @@ typedef struct
 
 } OSA_SCHED_INFO;
 
-#endif /*_FLEXRAN_COMMON_H*/
+#endif /*_I_OS_COMMON_H*/
 
 /*
  * -----------------------------------------------------------

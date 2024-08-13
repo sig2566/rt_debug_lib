@@ -22,10 +22,10 @@
 #include <errno.h>
 #include <sys/time.h>
 #include <cassert>
-
+#include <stdint.h>
 
 #endif
-#include "i_sys_types.h"
+
 #include "i_sys_utils.h"
 #include "i_os_common.h"
 /*

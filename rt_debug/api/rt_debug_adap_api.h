@@ -4,13 +4,17 @@
  *  Created on: Oct 8, 2022
  *      Author: igors
  */
-#include "i_sys_types.h"
+
+//
 #ifndef API_RT_DEBUG_ADAP_API_H_
 #define API_RT_DEBUG_ADAP_API_H_
+#include "rt_debug_defs.h"
+
 #ifdef __cplusplus
 extern "C" {
 #else
-#define bool uint32_t
+//#define bool uint32_t
+#include <stdbool.h>    // bool type
 #endif
 #undef DEF_GROUP
 #define DEF_GROUP(a)  a,
@@ -42,6 +46,7 @@ enum EGroupProfile
 #include "profiles.inc"
 MAX_PROFILER
 };
+
 //Initialization of RT debug environment and prepare collection of the debug information into the file mem_map_file
 int RT_debug_init(char *mem_map_file);
 //Add trace data

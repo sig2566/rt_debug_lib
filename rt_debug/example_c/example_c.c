@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <unistd.h>  //Header file for sleep(). man 3 sleep for details.
 #include <pthread.h>
+#include <string.h>
 #include "rt_debug_adap_api.h"
 
 enum PROG_ACTION{
@@ -40,14 +41,14 @@ void WorkThread(void* param)
 	int i;
 	int *delay= (int*)param;
 	ProfilePoint prof_task;
-	uint64_t *watch_dog= RTDBG_GET_EVENT_CNTR_PTR(STATUS_GROUP,EV_WATCHDOG);
+	volatile uint64_t *watch_dog= RTDBG_GET_EVENT_CNTR_PTR(STATUS_GROUP,EV_WATCHDOG);
 	RTDBG_INIT_PROF(GEN_GROUP, UI_PROF, &prof_task, 500);
 	for(i=0; i < num_iter; i++)
 	{
 		*watch_dog+=1;
 		RTDBG_START_PROF(GEN_GROUP, UI_PROF, &prof_task);
 		RTDBG_SAVE_TRACE(GEN_GROUP, PASSED, i, 0, 0, 0);
-		usleep(*delay);
+		usleep((int)*delay);
 		RTDBG_STOP_PROF(GEN_GROUP, UI_PROF, &prof_task);
 	}
 	RTDBG_FLUSH_DATA_PROF(GEN_GROUP, TST_PROF, &prof_task);
@@ -63,7 +64,7 @@ void Run_application()
 	const int delay_avg= 1000;
 	int i;
 	pthread_t tid[thread_num];
-	uint64_t *ex_status= RTDBG_GET_EVENT_CNTR_PTR(STATUS_GROUP,EV_STATUS);
+	volatile int64_t *ex_status= RTDBG_GET_EVENT_CNTR_PTR(STATUS_GROUP,EV_STATUS);
 	*ex_status= 0;
 	for(i=0;i<thread_num;i++)
 	{

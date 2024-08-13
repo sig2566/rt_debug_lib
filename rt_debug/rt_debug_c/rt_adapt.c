@@ -10,10 +10,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include "rt_debug_defs.h"
 #include "rt_debug_api.h"
 #include "rt_debug_adap_api.h"
 //Define groups
-
 #undef DEF_GROUP
 #define DEF_GROUP(a) (char*)#a,
 char *group_names[]=
@@ -111,13 +111,13 @@ i=0;
 //Add trace data
 int RT_debug_save_trace(enum EGroupTrace id, int line, uint64_t val0, uint64_t val1, uint64_t val2, uint64_t val3)
 {
-	RTDBG_AddTrace(traces[id].group_id, traces[id].trace_id, line, NULL, val0, val1, val2, val3);
+	RTDBG_AddTrace(traces[id].group_id, traces[id].trace_id, line, val0, val1, val2, val3);
 	return 0;
 }
 //Save log data
 void RT_debug_save_log(enum E_GROUPS id, int line, char* log_str)
 {
-	return RTDBG_AddLog(id, NULL, log_str);
+	return RTDBG_AddLog(id, log_str);
 }
 
 volatile uint64_t* RT_debug_get_event_cnt(int group_name)
