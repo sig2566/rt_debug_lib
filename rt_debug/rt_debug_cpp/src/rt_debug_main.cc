@@ -147,7 +147,7 @@ bool        CDebugHandler::RTDBG_GetTraceEntry(char *trace_entry_str, struct tim
 		CGroupDebugRT* grp_p= rt_debugp_->GetDebugGrp(i);
 		tracers[i] = grp_p->GetTracer();
 
-		if(grp_trace_res_[i].status == NO_DATA_IND)
+		if(grp_trace_res_[i].status == TRACE_EMPTY_DATA)
 		{
 			continue;
 		}
@@ -157,9 +157,10 @@ bool        CDebugHandler::RTDBG_GetTraceEntry(char *trace_entry_str, struct tim
 		{
 			if(tracers[i]->GetTraceEntry(trc_datap->trace_str, &trc_datap->lin_time)==false)
 			{
-				grp_trace_res_[i].status = NO_DATA_IND; //NO new trace data for group i
+				grp_trace_res_[i].status = TRACE_EMPTY_DATA; //NO new trace data for group i
 				continue;
 			}
+			grp_trace_res_[i].status = DATA_IND;
 
 		}
 		if(DiffBetweenTimespec(trc_datap->lin_time, min_time) < 0)

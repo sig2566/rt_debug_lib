@@ -78,8 +78,8 @@ void CTraceGroup::AddTrace(uint32_t trace_id, uint32_t line_num, uint64_t var0, 
 	tmp_entry.vals[2] = var2;
 	tmp_entry.vals[3] = var3;
 	tmp_entry.status  = DATA_IND;
-	*trace_entry_ptr = tmp_entry;
-	//memcpy(trace_entry_ptr, &tmp_entry, sizeof(tmp_entry));
+	//*trace_entry_ptr = tmp_entry;
+	memcpy(trace_entry_ptr, &tmp_entry, sizeof(tmp_entry));
 }
 
 bool CTraceGroup::GetTraceEntry(char *trace_entry_str, timespec *linux_time)

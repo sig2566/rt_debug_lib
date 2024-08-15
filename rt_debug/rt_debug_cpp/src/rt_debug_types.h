@@ -126,7 +126,8 @@ struct Trace_entry
 	uint64_t 		vals[4];
 	};
 const uint16_t NO_DATA_IND= -1;
-const uint16_t DATA_IND= 0;
+const uint16_t DATA_IND = 0;
+const uint32_t TRACE_EMPTY_DATA = 1;
 /*******************************************************************************************//*!
 *@class CTraceGroup class
 *@brief The purpose of this class is :
