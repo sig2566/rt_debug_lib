@@ -152,7 +152,7 @@ public:
 	bool GetTraceEntry(char *trace_entry_str, timespec *linux_time);
 
 };
-const uint32_t LOG_STRING_SIZE= TRACE_STRING_SIZE - sizeof(timespec) - sizeof(GenSysTime);
+const uint32_t LOG_STRING_SIZE= TRACE_STRING_SIZE - sizeof(timespec);
 struct LogEntry
 {
 	timespec 		linux_time;

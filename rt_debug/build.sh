@@ -1,7 +1,7 @@
 #!/bin/bash
 cd rt_debug_cpp/
-make -f Makefile.static clean
-make -f Makefile.static
+make -f Makefile clean
+make -f Makefile
 cd ../rt_debug_c
 make -f Makefile.static clean
 make -f Makefile.static

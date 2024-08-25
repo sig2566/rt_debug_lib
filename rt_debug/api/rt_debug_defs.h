@@ -31,15 +31,6 @@ typedef volatile unsigned int vuint32_t;
  */
 typedef int (*PRINTFUNC) (cchar *sformat, ...);
 
-
-typedef struct
-{
-	uint16_t nf;
-	uint16_t nsf;
-	int32_t offset;
-} GenSysTime;
-
-
 typedef enum
 {
 	TIME_EVAL,
