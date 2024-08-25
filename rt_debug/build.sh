@@ -9,3 +9,7 @@ cd ../example_c
 make -f Makefile.exec clean
 make -f Makefile.exec
 cd ..
+echo "cp rt_debug_cpp/bin/librtdebug.so ../../app_framework/bin/."
+cp ./rt_debug_cpp/bin/librtdebug.so ../../app_framework/bin/.
+
+
