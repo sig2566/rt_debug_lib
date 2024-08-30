@@ -36,26 +36,44 @@ typedef enum
 	TIME_EVAL,
 	CYCLE_EVAL
 }EProfileEval_type;
+
+#ifndef __cplusplus
 typedef struct
 {
+#else
+struct ProfileData {
+#endif
 	alignas(CACHE_ALIGNMENT) uint64_t max_cnt_;
 	uint64_t max_cnt_time_;
 	uint64_t last_cnt_;
 	uint64_t average_cnt_;
 	uint64_t meas_num_;
 
-
+#ifdef __cplusplus
+	ProfileData()
+	{
+		Reset();
+	}
+	void Reset()
+	{
+		max_cnt_ = last_cnt_ = average_cnt_ = max_cnt_time_ = 0;
+		meas_num_ = 0;
+	}
+};
+#else
 } ProfileData;
+#endif
+
 typedef struct
 {
-	ProfileData prof_data;
+	ProfileData prof_data_;
 
 	uint64_t acc_cnt_; //Support multiple start stop during one measurement
 	uint32_t cnt_id_;
 	uint32_t max_calls_;
 	uint64_t start_val_;
 	uint64_t delta_;
-	uint32_t	prof_id;
+	uint32_t	prof_id_;
 	EProfileEval_type 	evalType_;
 	void *mem_ptr_;
 

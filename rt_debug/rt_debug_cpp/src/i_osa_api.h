@@ -26,7 +26,7 @@
 
 #endif
 
-#include "i_sys_utils.h"
+//#include "i_sys_utils.h"
 #include "i_os_common.h"
 /*
  * --------------------------------------------------------------------------------
@@ -42,6 +42,38 @@
 
 #define OSA_DEFAULT_STACK_SIZE	1024
 #define OSA_DEFAULT_PRIORITY	10
+#define ASSERT assert
+
+// align the size to the nearest aligned value
+#define ALIGN_SIZE(x, ALIGNMENT_VALUE) (((x)+ALIGNMENT_VALUE-1)&(~(ALIGNMENT_VALUE-1)))
+
+// add to the size an additional section with alignment value size in order to be able to align the allocated memory to the alignment value
+#define ADD_SIZE_FOR_MEM_ALIGN(x, ALIGNMENT_VALUE) ((x)+ALIGNMENT_VALUE-1)
+// align the pointer to the nearest aligned value
+#define ALIGN_POINTER(x, ALIGNMENT_VALUE) ((uint64_t)((((uint64_t)(x))+ALIGNMENT_VALUE-1)&(~(ALIGNMENT_VALUE-1))))
+
+#define ALIGN_128BIT(n)				((n) & ~0x0000000f)
+#define INC_128BIT(n)				((n) + 0x00000010)
+#define CHECK_ALIGN_128BIT(n)		(!((n) & 0x0000000c))
+
+#define ALIGN_64BIT(n)              ((n) & ~0x00000007)
+#define INC_64BIT(n)                ((n) + 0x00000008)
+#define CHECK_ALIGN_64BIT(n)	    (!((n) & 0x00000007))
+
+#define ALIGN_32BIT(n)              ((n) & ~0x00000003)
+#define INC_32BIT(n)                ((n) + 0x00000004)
+#define CHECK_ALIGN_32BIT(n)		(!((n) & 0x00000003))
+
+#define ALIGN_4SAMPLES(n)			((n) & ~0x00000003)
+#define CHECK_ALIGN_4SAMPLES(n)		(!((n) & 0x00000003))
+
+#define BITS_TO_BYTES(n)            ((((n) + 7)) >> 3)
+#define BITS_TO_WORDS(n)            ((((n) + 31)) >> 5)
+#define ALIGN_TO_4(n)				(((n) + 3) & ~3)
+
+
+#define W32_TO_BYTES(n)				((n) << 2)
+#define BYTES_TO_W32(n)				((n) >> 2)
 
 #define	OSA_MEM_BL16_POOL_ID	0
 #define	OSA_MEM_BL32_POOL_ID	1
@@ -153,7 +185,7 @@ static void OSA_thread_attr_set_priority(OSA_thread_attr_t *attr, OSA_prio prior
 #ifdef POSIX_API
     int32_t s;
     struct sched_param param;
-    ASSERT(priority < OSA_PRIO_MAX)
+    ASSERT(priority < OSA_PRIO_MAX);
     if(priority <= OSA_PRIO_LOW)
     {
         //Set low priority
@@ -181,7 +213,7 @@ static void OSA_thread_create( pthread_t *thread, const
         void *arg)
 {
 #ifdef POSIX_API
-    ASSERT(pthread_create(thread, thread_attr, start_routine, arg) == 0)
+    ASSERT(pthread_create(thread, thread_attr, start_routine, arg) == 0);
 #endif
 }
 //void OSA_thread_destroy(void *thread);
