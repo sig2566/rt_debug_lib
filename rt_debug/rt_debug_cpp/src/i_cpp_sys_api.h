@@ -158,7 +158,7 @@ namespace RT_DEBUG
 	  {
 		  Init();
 	  }
-	  void Setup(uint32_t size, uint32_t inc_size, char *name, EAccessT access= E_READ, uint32_t attrtib=0 )
+	  void Setup(uint32_t size, uint32_t inc_size, const char *name, EAccessT access= E_READ, uint32_t attrtib=0 )
 	  {
 		  rd_ind_ = 0;
 		  wr_ind_ = 1;
@@ -419,7 +419,7 @@ namespace RT_DEBUG
 		  {
 			 return (void*)((char*)buf_ + single_chunk_size_ * wr_ind_);;
 		  }
-		  void Setup(uint32_t size, uint32_t inc_size, char *name, EAccessT access= E_READ, uint32_t attrib=0 )
+		  void Setup(uint32_t size, uint32_t inc_size, const char *name, EAccessT access= E_READ, uint32_t attrib=0 )
 		  {
 			  CMemArea::Setup(CHUNKS_NUM, sizeof(T), name, access, attrib);
 		  }

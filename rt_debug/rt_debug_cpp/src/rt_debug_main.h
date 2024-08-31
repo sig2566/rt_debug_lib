@@ -123,7 +123,7 @@ public:
 		InitExtractTables();
 		rt_debugp_->Init();
 	}
-	HANDLER     RTDBG_AllocRTDebugGroup(char* group_name)
+	HANDLER     RTDBG_AllocRTDebugGroup(const char* group_name)
 	{
 		if(!mem_attached_)
 			return -1;
@@ -327,7 +327,7 @@ public:
 	}
 
 	//Profiler support
-	uint32_t  	RTDBG_AddProfiler(HANDLER debug_grp, char *prof_name)
+	uint32_t  	RTDBG_AddProfiler(HANDLER debug_grp, const char *prof_name)
 	{
 		if(!mem_attached_)
 			return -1;

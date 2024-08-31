@@ -228,7 +228,7 @@ EXTERN_C  bool RTDBG_GetLog(char *log_str, struct timespec *linux_time, uint64_t
 }
 
 //Profiler support
-EXTERN_C uint32_t  	RTDBG_AddProfiler(HANDLER debug_grp, char *prof_name)
+EXTERN_C uint32_t  	RTDBG_AddProfiler(HANDLER debug_grp, const char *prof_name)
 {
 	return debug_handler.RTDBG_AddProfiler(debug_grp, prof_name);
 }
@@ -267,7 +267,7 @@ EXTERN_C void        RTDBG_Init()
 {
 	debug_handler.RTDBG_Init();
 }
-EXTERN_C HANDLER     RTDBG_AllocRTDebugGroup(char* group_name)
+EXTERN_C HANDLER     RTDBG_AllocRTDebugGroup(const char* group_name)
 {
 	return debug_handler.RTDBG_AllocRTDebugGroup(group_name);
 }

@@ -40,7 +40,7 @@ void CTraceGroup::Reset(bool attach)
 	trace_fifo_.MemAlloc();
 }
 
-void CTraceGroup::SetGroupName(char* group_name)
+void CTraceGroup::SetGroupName(const char* group_name)
 {
 	strcpy(group_name_, group_name);
 }

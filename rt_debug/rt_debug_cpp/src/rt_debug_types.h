@@ -61,7 +61,7 @@ public:
 		}
 		group_name_[0]= 0;
 	}
-	void SetGroupName(char* group_name)
+	void SetGroupName(const char* group_name)
 	{
 		strcpy(group_name_, group_name);
 	}
@@ -144,7 +144,7 @@ class CTraceGroup
 public:
 	void Reset(bool attach= false);
 
-	void SetGroupName(char* group_name);
+	void SetGroupName(const char* group_name);
 
 	int32_t AddTraceFormat(char *format_str);
 	void AddTrace(uint32_t trace_id, uint32_t line_num, uint64_t var0 = 0, uint64_t var1 = 0, uint64_t var2 = 0, uint64_t var3 = 0);
@@ -165,7 +165,7 @@ class CLog_group
 	char group_name_[TRACE_STRING_SIZE];
 
 public:
-	void SetGroupName(char* group_name)
+	void SetGroupName(const char* group_name)
 	{
 		strcpy(group_name_, group_name);
 	}
@@ -470,12 +470,12 @@ public:
 	{
 		return &prof_fifo_[prof_id_];
 	}
-	void SetGroupName(char* group_name)
+	void SetGroupName(const char* group_name)
 	{
 		strcpy(group_name_, group_name);
 	}
 
-	uint32_t RegistryProfileEntry(char* prof_name)
+	uint32_t RegistryProfileEntry(const char* prof_name)
 	{
 		uint32_t i;
 		ASSERT(num_alloc_prof_<=PROF_GROUP_MAX);
@@ -575,7 +575,7 @@ public:
 	}
 
 	//Group initialization
-	void Init(char* group_name)
+	void Init(const char* group_name)
 	{
 		Reset();
 		strncpy(group_name_, group_name, TRACE_STRING_SIZE);
@@ -673,7 +673,7 @@ public:
 		return num_alloc_groups_;
 	}
 
-	uint32_t AllocDbgGrp(char* group_name)
+	uint32_t AllocDbgGrp(const char* group_name)
 	{
 		uint32_t i;
 		char tmp_str[TRACE_STRING_SIZE];

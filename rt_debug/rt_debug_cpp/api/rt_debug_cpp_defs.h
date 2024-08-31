@@ -73,7 +73,7 @@ extern "C" {
 	{
 		max_calls_= val;
 	}
-	void Init(char *name, char *group_name)
+	void Init(const char *name, const char *group_name)
 	{
 		ProfileData* read_p;
 		group_id_= RTDBG_AllocRTDebugGroup(group_name);

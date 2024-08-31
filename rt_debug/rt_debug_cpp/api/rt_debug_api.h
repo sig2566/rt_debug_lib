@@ -67,7 +67,7 @@ bool RTDBG_GetLog(char *log_strm, struct timespec *linux_time, uint64_t grp_mask
 
 //Profiler support
 //Allocate new profiling entry with name prof_name
-uint32_t  	RTDBG_AddProfiler(HANDLER debug_grp, char *prof_name);
+uint32_t  	RTDBG_AddProfiler(HANDLER debug_grp, const char *prof_name);
 
 //Collection profiler messages .
 void		RTDBG_StartProfMeas(HANDLER debug_grp, uint32_t prof_id, ProfilePoint *prof_point);
@@ -87,7 +87,7 @@ void        RTDBG_Init();
 
 //Allocates debugging group.
 // This function returns index of the debug group. If the group with the sane name is allocated then the index of existed group is removed.
-HANDLER     RTDBG_AllocRTDebugGroup(char* group_name);
+HANDLER     RTDBG_AllocRTDebugGroup(const char* group_name);
 
 //Return the name of the group debug_grp
 bool		RTDBG_GetGrpName(HANDLER debug_grp, char  *grp_name);
