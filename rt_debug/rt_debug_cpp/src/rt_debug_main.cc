@@ -276,6 +276,12 @@ EXTERN_C void RTDBG_PutProfVal(HANDLER debug_grp, uint32_t prof_id, uint64_t *va
 {
 	return debug_handler.RTDBG_PutProfVal(debug_grp, prof_id, val, prof_point);
 }
+
+EXTERN_C uint32_t	RTDBG_AllocProfCntrNum(HANDLER debug_grp)
+{
+	return debug_handler.RTDBG_AllocProfCntrNum(debug_grp);
+}
+
 //Return the name of the group debug_grp
 EXTERN_C bool	RTDBG_GetGrpName(HANDLER debug_grp, char  *grp_name)
 {

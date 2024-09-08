@@ -44,12 +44,6 @@ extern "C" {
  *@brief The purpose of this class is :
  *@brief This class implements the profiler counter.
  *********************************************************************************************/
-	enum EProfileEval_type
-	{
-		TIME_EVAL,
-		CYCLE_EVAL
-	};
-
 
 
 	class CProfilePoint: public ProfilePoint
@@ -119,6 +113,8 @@ extern "C" {
 
 	};
 } //namespace
+
+
 
 #endif
 
