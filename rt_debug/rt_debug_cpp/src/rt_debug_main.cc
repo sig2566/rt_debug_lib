@@ -300,7 +300,7 @@ EXTERN_C void        RTDBG_Start()
 {
 	debug_handler.RTDBG_Start();
 }
-EXTERN_C void RTDBG_SetSharedMemFile(char* mem_mapped_file)
+EXTERN_C void RTDBG_SetSharedMemFile(const char* mem_mapped_file)
 {
 	debug_handler.RTDBG_SetSharedMemFile(mem_mapped_file);
 }

@@ -102,7 +102,7 @@ void        RTDBG_Stop();
 void        RTDBG_Start();
 
 //Set the name of the shared memory file. This file will be created in the /tmp directory,
-void		RTDBG_SetSharedMemFile(char* mem_mapped_file);
+void		RTDBG_SetSharedMemFile(const char* mem_mapped_file);
 
 //Creating shared memory file to save the RT debugging info.
 bool  	RTDBG_ActivateDebugDataCollection();

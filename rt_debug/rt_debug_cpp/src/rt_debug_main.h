@@ -168,7 +168,7 @@ public:
 			return false;
 		return rt_debugp_->IsDataCollected();
 	}
-	void 		RTDBG_SetSharedMemFile(char* mem_mapped_file)
+	void 		RTDBG_SetSharedMemFile(const char* mem_mapped_file)
 	{
 		sprintf(shared_file_name_,"%s", mem_mapped_file);
 	}

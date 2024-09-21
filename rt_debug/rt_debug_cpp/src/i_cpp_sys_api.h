@@ -124,7 +124,7 @@ namespace RT_DEBUG
 #endif
 
 	class ITarget;
-	class IGL_ControlAPI;
+	class RSE_ControlAPI;
 	class IModuleControlAPI;
 	class CProfileCnt;
 
