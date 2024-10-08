@@ -1,9 +1,6 @@
 /******************************************************************
  * i_cpp_sys_api.h
  * Author: Igor Shoihet
- * Copyright (c) 2018 - 2020 Airspan Networks
- * All Rights Reserved.
- * Confidential and Proprietary - Airspan Networks
  *******************************************************************/
 
 #ifndef I_COMP_API_H_

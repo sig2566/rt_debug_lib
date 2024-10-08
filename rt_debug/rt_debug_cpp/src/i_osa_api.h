@@ -1,9 +1,6 @@
 /******************************************************************
  * i_osa_api.h
  * Author: Igor Shoihet
- * Copyright (c) 2018 - 2020 Airspan Networks
- * All Rights Reserved.
- * Confidential and Proprietary - Airspan Networks
  *******************************************************************/
 #ifndef _OSA_API_H
 #define _OSA_API_H

@@ -2,9 +2,6 @@
 /******************************************************************
  * rt_debug_main.h
  * Author: Igor Shoihet
- * Copyright (c) 2018 - 2020 Airspan Networks
- * All Rights Reserved.
- * Confidential and Proprietary - Airspan Networks
  *******************************************************************/
 
 #ifndef TOOLS_TRACER_RT_DEBUG_MAIN_H_
